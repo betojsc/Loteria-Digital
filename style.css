@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lobster&display=swap");
+
+.title {
+  font-family: "Lobster", cursive;
+  font-size: 3rem;
+  color: #92400e; /* amber-800 */
+}
+
+.title-font {
+  font-family: "Lobster", cursive;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.marked {
+  position: relative;
+}
+
+.marked::after {
+  content: "X";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: rgba(220, 38, 38, 0.8);
+  font-weight: bold;
+  backdrop-filter: blur(1px) grayscale(40%);
+  border-radius: 0.5rem;
+}
+
+.modal-background {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
