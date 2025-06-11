@@ -30,10 +30,7 @@ async function hashPassword(password) {
   const data = encoder.encode(password);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return hashHex;
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 const gameLogic = {
@@ -43,7 +40,7 @@ const gameLogic = {
     img: `${i + 1}.jpg`,
   })),
   shuffleDeck() {
-    const shuffled = [...this.fullDeck];
+    let shuffled = [...this.fullDeck];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -54,7 +51,6 @@ const gameLogic = {
     const boards = [];
     const usedBoardSignatures = new Set();
     const boardSize = rows * cols;
-
     while (boards.length < playerCount) {
       const deckCopy = this.shuffleDeck();
       const newBoardCards = deckCopy.slice(0, boardSize);
@@ -72,7 +68,7 @@ const gameLogic = {
 };
 
 const uiAdmin = {
-  // Selectores
+  // ... selectores ...
   loginSection: document.getElementById("login-section"),
   configSection: document.getElementById("config-section"),
   passwordInput: document.getElementById("password"),
@@ -87,9 +83,8 @@ const uiAdmin = {
   createGameBtn: document.getElementById("create-game-btn"),
   gameLinkContainer: document.getElementById("game-link-container"),
   gameLinkInput: document.getElementById("game-link"),
+  copyLinkBtn: document.getElementById("copy-link-btn"),
   goToGameBtn: document.getElementById("go-to-game-btn"),
-
-  // Selectores del Modal de Contraseña
   passwordModal: document.getElementById("password-modal"),
   showPasswordModalBtn: document.getElementById("show-password-modal-btn"),
   cancelPasswordChangeBtn: document.getElementById(
@@ -101,9 +96,10 @@ const uiAdmin = {
   newPasswordInput: document.getElementById("new-password"),
   confirmPasswordInput: document.getElementById("confirm-password"),
   passwordChangeStatus: document.getElementById("password-change-status"),
+  winnersList: document.getElementById("winners-list"),
 
   init() {
-    this.loginBtn.addEventListener("click", this.handleLogin.bind(this));
+    this.loginBtn.addEventListener("click", () => this.handleLogin());
     this.passwordInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") this.handleLogin();
     });
@@ -120,23 +116,20 @@ const uiAdmin = {
     try {
       const securityRef = doc(db, "app_config", "security");
       const docSnap = await getDoc(securityRef);
-
       if (docSnap.exists()) {
         const storedHash = docSnap.data().admin_password_hash;
         const inputHash = await hashPassword(inputPassword);
-
         if (inputHash === storedHash) {
           this.loginSection.classList.add("hidden");
           this.configSection.classList.remove("hidden");
-          this.subtitle.textContent = "Configura una nueva partida de Lotería";
+          this.subtitle.textContent =
+            "Configura o revisa el historial de partidas.";
           this.initPanel();
         } else {
-          this.errorMessage.textContent = "Error de contraseña.";
           this.errorMessage.classList.remove("hidden");
         }
       } else {
-        this.errorMessage.textContent =
-          "Error de configuración. Contacta al soporte.";
+        this.errorMessage.textContent = "Error de configuración.";
         this.errorMessage.classList.remove("hidden");
       }
     } catch (error) {
@@ -150,13 +143,13 @@ const uiAdmin = {
   },
 
   initPanel() {
-    this.rowsInput.addEventListener("input", this.updateTotal);
-    this.colsInput.addEventListener("input", this.updateTotal);
-    this.playerCountInput.addEventListener(
-      "input",
-      this.renderPlayerNameInputs
+    this.rowsInput.addEventListener("input", () => this.updateTotal());
+    this.colsInput.addEventListener("input", () => this.updateTotal());
+    this.playerCountInput.addEventListener("input", () =>
+      this.renderPlayerNameInputs()
     );
-    this.createGameBtn.addEventListener("click", this.createGame);
+    this.createGameBtn.addEventListener("click", () => this.createGame());
+    this.copyLinkBtn.addEventListener("click", () => this.copyGameLink());
 
     this.showPasswordModalBtn.addEventListener("click", () =>
       this.passwordModal.classList.remove("hidden")
@@ -164,13 +157,62 @@ const uiAdmin = {
     this.cancelPasswordChangeBtn.addEventListener("click", () =>
       this.passwordModal.classList.add("hidden")
     );
-    this.confirmPasswordChangeBtn.addEventListener(
-      "click",
-      this.handleChangePassword.bind(this)
+    this.confirmPasswordChangeBtn.addEventListener("click", () =>
+      this.handleChangePassword()
     );
 
     this.renderPlayerNameInputs();
     this.updateTotal();
+    this.fetchAndDisplayWinners();
+  },
+
+  copyGameLink() {
+    this.gameLinkInput.select();
+    document.execCommand("copy");
+    this.copyLinkBtn.textContent = "Copiado!";
+    setTimeout(() => {
+      this.copyLinkBtn.textContent = "Copiar";
+    }, 2000);
+  },
+
+  async fetchAndDisplayWinners() {
+    this.winnersList.innerHTML =
+      '<p class="text-center text-gray-500">Cargando historial...</p>';
+    try {
+      const q = query(collection(db, "games"), where("winner", "!=", null));
+      const querySnapshot = await getDocs(q);
+      const winners = [];
+      querySnapshot.forEach((doc) => {
+        winners.push({ id: doc.id, ...doc.data() });
+      });
+
+      if (winners.length === 0) {
+        this.winnersList.innerHTML =
+          '<p class="text-center text-gray-500">Aún no hay ganadores registrados.</p>';
+        return;
+      }
+
+      winners.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+
+      let html = "";
+      winners.forEach((game) => {
+        const date = game.createdAt.toDate().toLocaleString("es-MX");
+        html += `
+                    <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-emerald-600">${game.winner.name}</p>
+                            <p class="text-xs text-gray-500">Fecha: ${date}</p>
+                        </div>
+                        <a href="juego.html?id=${game.id}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold">Ver Partida</a>
+                    </div>
+                `;
+      });
+      this.winnersList.innerHTML = html;
+    } catch (error) {
+      console.error("Error fetching winners:", error);
+      this.winnersList.innerHTML =
+        '<p class="text-center text-red-500">No se pudo cargar el historial.</p>';
+    }
   },
 
   async handleChangePassword() {
@@ -192,8 +234,7 @@ const uiAdmin = {
       const securityRef = doc(db, "app_config", "security");
       await setDoc(securityRef, { admin_password_hash: newHash });
 
-      this.passwordChangeStatus.textContent =
-        "Contraseña actualizada con éxito.";
+      this.passwordChangeStatus.textContent = "Contraseña actualizada.";
       this.passwordChangeStatus.classList.remove("text-red-500");
       this.passwordChangeStatus.classList.add("text-green-500");
 
@@ -214,13 +255,13 @@ const uiAdmin = {
   },
 
   updateTotal() {
-    const rows = parseInt(uiAdmin.rowsInput.value, 10) || 1;
-    const cols = parseInt(uiAdmin.colsInput.value, 10) || 1;
-    uiAdmin.totalImagesSpan.textContent = rows * cols;
+    const rows = parseInt(this.rowsInput.value, 10) || 1;
+    const cols = parseInt(this.colsInput.value, 10) || 1;
+    this.totalImagesSpan.textContent = rows * cols;
   },
 
   renderPlayerNameInputs() {
-    const count = parseInt(uiAdmin.playerCountInput.value, 10) || 1;
+    const count = parseInt(this.playerCountInput.value, 10) || 1;
     let html =
       '<label class="block text-sm font-semibold text-gray-800 mb-2">Nombres de Jugadores</label>';
     for (let i = 0; i < count; i++) {
@@ -228,16 +269,16 @@ const uiAdmin = {
         i + 1
       }" value="Jugador ${i + 1}">`;
     }
-    uiAdmin.playerNamesContainer.innerHTML = html;
+    this.playerNamesContainer.innerHTML = html;
   },
 
   async createGame() {
-    uiAdmin.createGameBtn.disabled = true;
-    uiAdmin.createGameBtn.textContent = "Creando...";
+    this.createGameBtn.disabled = true;
+    this.createGameBtn.textContent = "Creando...";
 
     const gameId = doc(collection(db, "games")).id;
-    const rows = parseInt(uiAdmin.rowsInput.value, 10);
-    const cols = parseInt(uiAdmin.colsInput.value, 10);
+    const rows = parseInt(this.rowsInput.value, 10);
+    const cols = parseInt(this.colsInput.value, 10);
     const nameInputs = document.querySelectorAll(".player-name-input");
     const playerNames = Array.from(nameInputs).map((input) => input.value);
 
@@ -267,15 +308,16 @@ const uiAdmin = {
         window.location.pathname.replace("admin.html", "");
       const gameUrl = `${baseUrl}juego.html?id=${gameId}`;
 
-      uiAdmin.gameLinkInput.value = gameUrl;
-      uiAdmin.goToGameBtn.href = `${gameUrl}&admin=true`;
-      uiAdmin.gameLinkContainer.classList.remove("hidden");
-      uiAdmin.createGameBtn.textContent = "¡Partida Creada!";
+      this.gameLinkInput.value = gameUrl;
+      this.goToGameBtn.href = `${gameUrl}&admin=true`;
+      this.gameLinkContainer.classList.remove("hidden");
+      this.fetchAndDisplayWinners(); // Actualizar historial
     } catch (error) {
       console.error("Error al crear la partida:", error);
       alert("No se pudo crear la partida. Revisa la consola.");
-      uiAdmin.createGameBtn.disabled = false;
-      uiAdmin.createGameBtn.textContent = "Crear Partida y Obtener Enlace";
+    } finally {
+      this.createGameBtn.disabled = false;
+      this.createGameBtn.textContent = "Crear Partida";
     }
   },
 };

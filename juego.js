@@ -26,6 +26,7 @@ const analytics = getAnalytics(app);
 let currentGameData = null;
 
 const uiGame = {
+  loadingView: document.getElementById("loading-view"),
   placeholderView: document.getElementById("placeholder-view"),
   gameState: document.getElementById("game-state"),
   currentCardContainer: document.getElementById("current-card-container"),
@@ -37,6 +38,7 @@ const uiGame = {
   winningBoard: document.getElementById("winning-board"),
 
   renderGame(gameData) {
+    this.loadingView.classList.add("hidden");
     this.placeholderView.classList.add("hidden");
     this.gameState.classList.remove("hidden");
 
@@ -86,6 +88,7 @@ const uiGame = {
   },
 
   showPlaceholder() {
+    this.loadingView.classList.add("hidden");
     this.placeholderView.classList.remove("hidden");
     this.gameState.classList.add("hidden");
   },
@@ -125,16 +128,20 @@ const uiGame = {
   },
 };
 
-const params = new URLSearchParams(window.location.search);
-const gameId = params.get("id");
-const isAdmin = params.get("admin") === "true";
+function main() {
+  const params = new URLSearchParams(window.location.search);
+  const gameId = params.get("id");
+  const isAdmin = params.get("admin") === "true";
 
-if (!gameId) {
-  uiGame.showPlaceholder();
-} else {
+  if (!gameId) {
+    uiGame.showPlaceholder();
+    return;
+  }
+
   if (isAdmin) {
     uiGame.initAdminControls(gameId);
   }
+
   const gameRef = doc(db, "games", gameId);
   onSnapshot(
     gameRef,
@@ -152,3 +159,5 @@ if (!gameId) {
     }
   );
 }
+
+main();
