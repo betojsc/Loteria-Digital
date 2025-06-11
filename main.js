@@ -5,60 +5,60 @@
 //============================================
 const gameLogic = {
   fullDeck: [
-    { id: 1, name: "El Gallo" },
-    { id: 2, name: "El Diablo" },
-    { id: 3, name: "La Dama" },
-    { id: 4, name: "El Catrín" },
-    { id: 5, name: "El Paraguas" },
-    { id: 6, name: "La Sirena" },
-    { id: 7, name: "La Escalera" },
-    { id: 8, name: "La Botella" },
-    { id: 9, name: "El Barril" },
-    { id: 10, name: "El Árbol" },
-    { id: 11, name: "El Melón" },
-    { id: 12, name: "El Valiente" },
-    { id: 13, name: "El Gorrito" },
-    { id: 14, name: "La Muerte" },
-    { id: 15, name: "La Pera" },
-    { id: 16, name: "La Bandera" },
-    { id: 17, name: "El Bandolón" },
-    { id: 18, name: "El Violoncello" },
-    { id: 19, name: "La Garza" },
-    { id: 20, name: "El Pájaro" },
-    { id: 21, name: "La Mano" },
-    { id: 22, name: "La Bota" },
-    { id: 23, name: "La Luna" },
-    { id: 24, name: "El Cotorro" },
-    { id: 25, name: "El Borracho" },
-    { id: 26, name: "El Negrito" },
-    { id: 27, name: "El Corazón" },
-    { id: 28, name: "La Sandía" },
-    { id: 29, name: "El Tambor" },
-    { id: 30, name: "El Camarón" },
-    { id: 31, name: "Las Jaras" },
-    { id: 32, name: "El Músico" },
-    { id: 33, name: "La Araña" },
-    { id: 34, name: "El Soldado" },
-    { id: 35, name: "La Estrella" },
-    { id: 36, name: "El Cazo" },
-    { id: 37, name: "El Mundo" },
-    { id: 38, name: "El Apache" },
-    { id: 39, name: "El Nopal" },
-    { id: 40, name: "El Alacrán" },
-    { id: 41, name: "La Rosa" },
-    { id: 42, name: "La Calavera" },
-    { id: 43, name: "La Campana" },
-    { id: 44, name: "El Cantarito" },
-    { id: 45, name: "El Venado" },
-    { id: 46, name: "El Sol" },
-    { id: 47, name: "La Corona" },
-    { id: 48, name: "La Chalupa" },
-    { id: 49, name: "El Pino" },
-    { id: 50, name: "El Pescado" },
-    { id: 51, name: "La Palma" },
-    { id: 52, name: "La Maceta" },
-    { id: 53, name: "El Arpa" },
-    { id: 54, name: "La Rana" },
+    { id: 1, name: "El Gallo", img: "El Gallo.jpg" },
+    { id: 2, name: "El Diablito", img: "El Diablito.jpg" },
+    { id: 3, name: "La Dama", img: "La Dama.jpg" },
+    { id: 4, name: "El Catrin", img: "El Catrin.jpg" },
+    { id: 5, name: "El Paraguas", img: "El Paraguas.jpg" },
+    { id: 6, name: "La Sirena", img: "La Sirena.jpg" },
+    { id: 7, name: "La Escalera", img: "La Escalera.jpg" },
+    { id: 8, name: "La Botella", img: "La Botella.jpg" },
+    { id: 9, name: "El Barril", img: "El Barril.jpg" },
+    { id: 10, name: "El Arbol", img: "El Arbol.jpg" },
+    { id: 11, name: "El Melon", img: "El Melon.jpg" },
+    { id: 12, name: "El Valiente", img: "El Valiente.jpg" },
+    { id: 13, name: "El Gorrito", img: "El Gorrito.jpg" },
+    { id: 14, name: "La Muerte", img: "La Muerte.jpg" },
+    { id: 15, name: "La Pera", img: "La Pera.jpg" },
+    { id: 16, name: "La Bandera", img: "La Bandera.jpg" },
+    { id: 17, name: "El Bandolon", img: "El Bandolon.jpg" },
+    { id: 18, name: "El Violoncello", img: "El Violoncello.jpg" },
+    { id: 19, name: "La Garza", img: "La Garza.jpg" },
+    { id: 20, name: "El Pajaro", img: "El Pajaro.jpg" },
+    { id: 21, name: "La Mano", img: "La Mano.jpg" },
+    { id: 22, name: "La Bota", img: "La Bota.jpg" },
+    { id: 23, name: "La Luna", img: "La Luna.jpg" },
+    { id: 24, name: "El Cotorro", img: "El Cotorro.jpg" },
+    { id: 25, name: "El Borracho", img: "El Borracho.jpg" },
+    { id: 26, name: "El Negrito", img: "El Negrito.jpg" },
+    { id: 27, name: "El Corazon", img: "El Corazon.jpg" },
+    { id: 28, name: "La Sandia", img: "La Sandia.jpg" },
+    { id: 29, name: "El Tambor", img: "El Tambor.jpg" },
+    { id: 30, name: "El Camaron", img: "El Camaron.jpg" },
+    { id: 31, name: "Las Jaras", img: "Las Jaras.jpg" },
+    { id: 32, name: "El Musico", img: "El Musico.jpg" },
+    { id: 33, name: "La Araña", img: "La Arana.jpg" },
+    { id: 34, name: "El Soldado", img: "El Soldado.jpg" },
+    { id: 35, name: "La Estrella", img: "La Estrella.jpg" },
+    { id: 36, name: "El Cazo", img: "El Cazo.jpg" },
+    { id: 37, name: "El Mundo", img: "El Mundo.jpg" },
+    { id: 38, name: "El Apache", img: "El Apache.jpg" },
+    { id: 39, name: "El Nopal", img: "El Nopal.jpg" },
+    { id: 40, name: "El Alacran", img: "El Alacran.jpg" },
+    { id: 41, name: "La Rosa", img: "La Rosa.jpg" },
+    { id: 42, name: "La Calavera", img: "La Calavera.jpg" },
+    { id: 43, name: "La Campana", img: "La Campana.jpg" },
+    { id: 44, name: "El Cantarito", img: "El Cantarito.jpg" },
+    { id: 45, name: "El Venado", img: "El Venado.jpg" },
+    { id: 46, name: "El Sol", img: "El Sol.jpg" },
+    { id: 47, name: "La Corona", img: "La Corona.jpg" },
+    { id: 48, name: "La Chalupa", img: "La Chalupa.jpg" },
+    { id: 49, name: "El Pino", img: "El Pino.jpg" },
+    { id: 50, name: "El Pescado", img: "El Pescado.jpg" },
+    { id: 51, name: "La Palma", img: "La Palma.jpg" },
+    { id: 52, name: "La Maceta", img: "La Maceta.jpg" },
+    { id: 53, name: "El Arpa", img: "El Arpa.jpg" },
+    { id: 54, name: "La Rana", img: "La Rana.jpg" },
   ],
 
   shuffleDeck(deck) {
@@ -159,13 +159,8 @@ const ui = {
       const cardElement = document.createElement("div");
       cardElement.className = "aspect-w-1 aspect-h-1 relative";
       cardElement.innerHTML = `
-                <div id="card-${index}-${
-        card.id
-      }" class="relative w-full h-full rounded-lg bg-gray-200">
-                   <img src="https://placehold.co/150x200/fdfbf7/44403c?text=${card.name.replace(
-                     " ",
-                     "%0A"
-                   )}" alt="${card.name}" class="card-image">
+                <div id="card-${index}-${card.id}" class="relative w-full h-full rounded-lg bg-gray-200">
+                   <img src="assets/images/${card.img}" alt="${card.name}" class="card-image">
                 </div>`;
       grid.appendChild(cardElement);
     });
@@ -178,13 +173,8 @@ const ui = {
     if (card) {
       this.currentCardContainer.innerHTML = `
             <div class="w-full h-full p-2 relative card">
-                <img src="https://placehold.co/200x280/fdfbf7/44403c?text=${card.name.replace(
-                  " ",
-                  "%0A"
-                )}" alt="${card.name}" class="card-image">
-                <p class="absolute bottom-2 left-2 right-2 text-center bg-black bg-opacity-50 text-white text-sm font-bold p-1 rounded-b-lg">${
-                  card.name
-                }</p>
+                <img src="assets/images/${card.img}" alt="${card.name}" class="card-image">
+                <p class="absolute bottom-2 left-2 right-2 text-center bg-black bg-opacity-50 text-white text-sm font-bold p-1 rounded-b-lg">${card.name}</p>
             </div>`;
     } else {
       this.currentCardContainer.innerHTML = `<span class="text-gray-500">¡Se acabó el mazo!</span>`;
@@ -220,10 +210,7 @@ const ui = {
     player.board.cards.forEach((card) => {
       this.winningBoardContainer.innerHTML += `
                 <div class="aspect-w-1 aspect-h-1 relative">
-                    <img src="https://placehold.co/150x200/fdfbf7/44403c?text=${card.name.replace(
-                      " ",
-                      "%0A"
-                    )}" alt="${card.name}" class="card-image marked">
+                    <img src="assets/images/${card.img}" alt="${card.name}" class="card-image marked">
                 </div>`;
     });
     this.toggleModal(this.winnerModal, this.winnerModalContent, true);
@@ -239,10 +226,9 @@ const ui = {
                      <div class="relative w-full h-full rounded-lg bg-gray-200 ${
                        isMarked ? "marked" : ""
                      }">
-                        <img src="https://placehold.co/200x280/fdfbf7/44403c?text=${card.name.replace(
-                          " ",
-                          "%0A"
-                        )}" alt="${card.name}" class="card-image">
+                        <img src="assets/images/${card.img}" alt="${
+        card.name
+      }" class="card-image">
                     </div>
                 </div>`;
     });
