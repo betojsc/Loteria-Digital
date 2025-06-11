@@ -1,8 +1,12 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -18,7 +22,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
 // --- Funciones de Criptografía ---
 async function hashPassword(password) {
@@ -145,7 +149,6 @@ const uiAdmin = {
   },
 
   initPanel() {
-    // ... Listeners del panel ...
     this.rowsInput.addEventListener("input", this.updateTotal);
     this.colsInput.addEventListener("input", this.updateTotal);
     this.playerCountInput.addEventListener(
@@ -154,7 +157,6 @@ const uiAdmin = {
     );
     this.createGameBtn.addEventListener("click", this.createGame);
 
-    // Listeners del modal
     this.showPasswordModalBtn.addEventListener("click", () =>
       this.passwordModal.classList.remove("hidden")
     );
@@ -210,7 +212,6 @@ const uiAdmin = {
     }
   },
 
-  // ... (El resto de las funciones: updateTotal, renderPlayerNameInputs, createGame son iguales) ...
   updateTotal() {
     const rows = parseInt(uiAdmin.rowsInput.value, 10) || 1;
     const cols = parseInt(uiAdmin.colsInput.value, 10) || 1;
