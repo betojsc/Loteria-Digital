@@ -21,7 +21,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
 let currentGameData = null;
 
@@ -60,9 +60,12 @@ const uiGame = {
       let cardsHtml = "";
       player.board.cards.forEach((card) => {
         const isMarked = calledCards.some((cc) => cc.id === card.id);
-        cardsHtml += `<div class="relative"><img src="assets/images/${
-          card.img
-        }" class="card-image ${isMarked ? "marked" : ""}"></div>`;
+        // Aplicar la clase 'marked' al contenedor DIV para un mejor estilo
+        cardsHtml += `<div class="relative ${
+          isMarked ? "marked" : ""
+        }"><img src="assets/images/${card.img}" alt="${
+          card.name
+        }" class="card-image"></div>`;
       });
       boardEl.innerHTML = `
                 <h3 class="text-xl font-bold text-center mb-4 text-amber-700">${player.name}</h3>
@@ -79,7 +82,7 @@ const uiGame = {
       this.winningBoard.innerHTML = "";
       this.winningBoard.style.gridTemplateColumns = `repeat(${gameData.config.cols}, 1fr)`;
       gameData.winner.board.cards.forEach((card) => {
-        this.winningBoard.innerHTML += `<img src="assets/images/${card.img}" class="card-image marked">`;
+        this.winningBoard.innerHTML += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
       });
       this.winnerModal.classList.remove("hidden");
     } else {
@@ -131,30 +134,31 @@ const uiGame = {
 function main() {
   const params = new URLSearchParams(window.location.search);
   const gameId = params.get("id");
-  const isAdmin = params.get("admin") === "true";
+  const token = params.get("token"); // Leer el token en lugar de 'admin'
 
   if (!gameId) {
     uiGame.showPlaceholder();
     return;
   }
 
-  if (isAdmin) {
-    uiGame.initAdminControls(gameId);
-  }
-
   const gameRef = doc(db, "games", gameId);
+
   onSnapshot(
     gameRef,
     (doc) => {
       if (doc.exists()) {
         currentGameData = doc.data();
+        // Verificar si el token de la URL coincide con el de la partida
+        if (token && token === currentGameData.config.adminToken) {
+          uiGame.initAdminControls(gameId);
+        }
         uiGame.renderGame(currentGameData);
       } else {
         uiGame.showPlaceholder();
       }
     },
     (error) => {
-      console.error("Error al obtener la partida:", error);
+      console.error("Error al obtener datos de la partida:", error);
       uiGame.showPlaceholder();
     }
   );

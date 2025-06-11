@@ -16,12 +16,17 @@
   object-fit: cover;
   border-radius: 0.5rem;
   display: block;
+  transition: transform 0.2s;
 }
 
+/* El contenedor de la carta marcada */
 .marked {
-  position: relative;
+  border-radius: 0.5rem; /* Asegurar que el borde siga la forma de la imagen */
+  border: 4px solid #10b981; /* emerald-500 */
+  box-shadow: 0 0 15px #10b981;
 }
 
+/* La X sobre la imagen */
 .marked::after {
   content: "X";
   position: absolute;
@@ -32,10 +37,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  color: rgba(220, 38, 38, 0.8);
-  font-weight: bold;
-  backdrop-filter: blur(1px) grayscale(40%);
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 900;
+  text-shadow: 0 0 5px black;
+  backdrop-filter: grayscale(30%);
   border-radius: 0.5rem;
 }
 

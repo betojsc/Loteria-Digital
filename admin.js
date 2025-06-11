@@ -34,11 +34,62 @@ async function hashPassword(password) {
 }
 
 const gameLogic = {
-  fullDeck: Array.from({ length: 54 }, (_, i) => ({
-    id: i + 1,
-    name: `Carta ${i + 1}`,
-    img: `${i + 1}.jpg`,
-  })),
+  fullDeck: [
+    { id: 1, name: "El Gallo", img: "El Gallo.jpg" },
+    { id: 2, name: "El Diablito", img: "El Diablito.jpg" },
+    { id: 3, name: "La Dama", img: "La Dama.jpg" },
+    { id: 4, name: "El Catrin", img: "El Catrin.jpg" },
+    { id: 5, name: "El Paraguas", img: "El Paraguas.jpg" },
+    { id: 6, name: "La Sirena", img: "La Sirena.jpg" },
+    { id: 7, name: "La Escalera", img: "La Escalera.jpg" },
+    { id: 8, name: "La Botella", img: "La Botella.jpg" },
+    { id: 9, name: "El Barril", img: "El Barril.jpg" },
+    { id: 10, name: "El Arbol", img: "El Arbol.jpg" },
+    { id: 11, name: "El Melon", img: "El Melon.jpg" },
+    { id: 12, name: "El Valiente", img: "El Valiente.jpg" },
+    { id: 13, name: "El Gorrito", img: "El Gorrito.jpg" },
+    { id: 14, name: "La Muerte", img: "La Muerte.jpg" },
+    { id: 15, name: "La Pera", img: "La Pera.jpg" },
+    { id: 16, name: "La Bandera", img: "La Bandera.jpg" },
+    { id: 17, name: "El Bandolon", img: "El Bandolon.jpg" },
+    { id: 18, name: "El Violoncello", img: "El Violoncello.jpg" },
+    { id: 19, name: "La Garza", img: "La Garza.jpg" },
+    { id: 20, name: "El Pajaro", img: "El Pajaro.jpg" },
+    { id: 21, name: "La Mano", img: "La Mano.jpg" },
+    { id: 22, name: "La Bota", img: "La Bota.jpg" },
+    { id: 23, name: "La Luna", img: "La Luna.jpg" },
+    { id: 24, name: "El Cotorro", img: "El Cotorro.jpg" },
+    { id: 25, name: "El Borracho", img: "El Borracho.jpg" },
+    { id: 26, name: "El Negrito", img: "El Negrito.jpg" },
+    { id: 27, name: "El Corazon", img: "El Corazon.jpg" },
+    { id: 28, name: "La Sandia", img: "La Sandia.jpg" },
+    { id: 29, name: "El Tambor", img: "El Tambor.jpg" },
+    { id: 30, name: "El Camaron", img: "El Camaron.jpg" },
+    { id: 31, name: "Las Jaras", img: "Las Jaras.jpg" },
+    { id: 32, name: "El Musico", img: "El Musico.jpg" },
+    { id: 33, name: "La Arana", img: "La Arana.jpg" },
+    { id: 34, name: "El Soldado", img: "El Soldado.jpg" },
+    { id: 35, name: "La Estrella", img: "La Estrella.jpg" },
+    { id: 36, name: "El Cazo", img: "El Cazo.jpg" },
+    { id: 37, name: "El Mundo", img: "El Mundo.jpg" },
+    { id: 38, name: "El Apache", img: "El Apache.jpg" },
+    { id: 39, name: "El Nopal", img: "El Nopal.jpg" },
+    { id: 40, name: "El Alacran", img: "El Alacran.jpg" },
+    { id: 41, name: "La Rosa", img: "La Rosa.jpg" },
+    { id: 42, name: "La Calavera", img: "La Calavera.jpg" },
+    { id: 43, name: "La Campana", img: "La Campana.jpg" },
+    { id: 44, name: "El Cantarito", img: "El Cantarito.jpg" },
+    { id: 45, name: "El Venado", img: "El Venado.jpg" },
+    { id: 46, name: "El Sol", img: "El Sol.jpg" },
+    { id: 47, name: "La Corona", img: "La Corona.jpg" },
+    { id: 48, name: "La Chalupa", img: "La Chalupa.jpg" },
+    { id: 49, name: "El Pino", img: "El Pino.jpg" },
+    { id: 50, name: "El Pescado", img: "El Pescado.jpg" },
+    { id: 51, name: "La Palma", img: "La Palma.jpg" },
+    { id: 52, name: "La Maceta", img: "La Maceta.jpg" },
+    { id: 53, name: "El Arpa", img: "El Arpa.jpg" },
+    { id: 54, name: "La Rana", img: "La Rana.jpg" },
+  ],
   shuffleDeck() {
     let shuffled = [...this.fullDeck];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -68,7 +119,6 @@ const gameLogic = {
 };
 
 const uiAdmin = {
-  // ... selectores ...
   loginSection: document.getElementById("login-section"),
   configSection: document.getElementById("config-section"),
   passwordInput: document.getElementById("password"),
@@ -277,6 +327,7 @@ const uiAdmin = {
     this.createGameBtn.textContent = "Creando...";
 
     const gameId = doc(collection(db, "games")).id;
+    const adminToken = crypto.randomUUID(); // Generar token seguro
     const rows = parseInt(this.rowsInput.value, 10);
     const cols = parseInt(this.colsInput.value, 10);
     const nameInputs = document.querySelectorAll(".player-name-input");
@@ -293,7 +344,11 @@ const uiAdmin = {
     }));
 
     const gameData = {
-      config: { rows, cols },
+      config: {
+        rows,
+        cols,
+        adminToken, // Guardar el token en la configuración
+      },
       players,
       deck: gameLogic.shuffleDeck(),
       calledCards: [],
@@ -307,11 +362,12 @@ const uiAdmin = {
         window.location.origin +
         window.location.pathname.replace("admin.html", "");
       const gameUrl = `${baseUrl}juego.html?id=${gameId}`;
+      const adminUrl = `${gameUrl}&token=${adminToken}`; // Enlace de admin con el token
 
-      this.gameLinkInput.value = gameUrl;
-      this.goToGameBtn.href = `${gameUrl}&admin=true`;
+      this.gameLinkInput.value = gameUrl; // El enlace para jugadores no tiene token
+      this.goToGameBtn.href = adminUrl; // El botón para el admin sí
       this.gameLinkContainer.classList.remove("hidden");
-      this.fetchAndDisplayWinners(); // Actualizar historial
+      this.fetchAndDisplayWinners();
     } catch (error) {
       console.error("Error al crear la partida:", error);
       alert("No se pudo crear la partida. Revisa la consola.");
