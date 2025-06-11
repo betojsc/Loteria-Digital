@@ -133,8 +133,8 @@ const uiAdmin = {
   playerNamesContainer: document.getElementById("player-names-container"),
   createGameBtn: document.getElementById("create-game-btn"),
   gameLinkContainer: document.getElementById("game-link-container"),
-  gameLinkInput: document.getElementById("game-link"),
   copyLinkBtn: document.getElementById("copy-link-btn"),
+  copyFeedback: document.getElementById("copy-feedback"),
   goToGameBtn: document.getElementById("go-to-game-btn"),
   passwordModal: document.getElementById("password-modal"),
   showPasswordModalBtn: document.getElementById("show-password-modal-btn"),
@@ -148,6 +148,7 @@ const uiAdmin = {
   confirmPasswordInput: document.getElementById("confirm-password"),
   passwordChangeStatus: document.getElementById("password-change-status"),
   winnersList: document.getElementById("winners-list"),
+  activeGamesList: document.getElementById("active-games-list"),
 
   init() {
     this.loginBtn.addEventListener("click", () => this.handleLogin());
@@ -251,60 +252,140 @@ const uiAdmin = {
 
     this.renderPlayerNameInputs();
     this.updateTotal();
-    this.fetchAndDisplayWinners();
+    this.loadGames();
+
+    this.activeGamesList.addEventListener("click", (e) => {
+      const copyBtn = e.target.closest(".copy-active-link-btn");
+      if (copyBtn) {
+        this.copyToClipboard(
+          copyBtn.dataset.playerUrl,
+          copyBtn.nextElementSibling
+        );
+      }
+    });
   },
 
   copyGameLink() {
-    this.gameLinkInput.select();
-    document.execCommand("copy");
-    this.copyLinkBtn.textContent = "Copiado!";
-    setTimeout(() => {
-      this.copyLinkBtn.textContent = "Copiar";
-    }, 2000);
+    const urlToCopy = this.copyLinkBtn.dataset.playerUrl;
+    this.copyToClipboard(urlToCopy, this.copyFeedback);
   },
 
-  async fetchAndDisplayWinners() {
+  copyToClipboard(text, feedbackElement) {
+    if (!text || !feedbackElement) return;
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        feedbackElement.textContent = "¡Copiado!";
+        setTimeout(() => {
+          feedbackElement.textContent = "";
+        }, 2500);
+      })
+      .catch((err) => {
+        console.error("Error al copiar el enlace: ", err);
+        feedbackElement.textContent = "Error";
+        setTimeout(() => {
+          feedbackElement.textContent = "";
+        }, 2500);
+      });
+  },
+
+  async loadGames() {
+    this.activeGamesList.innerHTML =
+      '<p class="text-center text-gray-500">Cargando partidas...</p>';
     this.winnersList.innerHTML =
       '<p class="text-center text-gray-500">Cargando historial...</p>';
+
     try {
       const gamesCollectionRef = collection(db, "games");
       const querySnapshot = await getDocs(gamesCollectionRef);
 
+      const activeGames = [];
       const winners = [];
+
       querySnapshot.forEach((doc) => {
         const gameData = doc.data();
-        if (gameData.winner && gameData.winner.name) {
+        if (gameData.winner) {
           winners.push({ id: doc.id, ...gameData });
+        } else {
+          activeGames.push({ id: doc.id, ...gameData });
         }
       });
 
-      if (winners.length === 0) {
-        this.winnersList.innerHTML =
-          '<p class="text-center text-gray-500">Aún no hay ganadores registrados.</p>';
-        return;
-      }
-
-      winners.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
-
-      let html = "";
-      winners.forEach((game) => {
-        const date = game.createdAt.toDate().toLocaleString("es-MX");
-        html += `
-                    <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-emerald-600">${game.winner.name}</p>
-                            <p class="text-xs text-gray-500">Fecha: ${date}</p>
-                        </div>
-                        <a href="juego.html?id=${game.id}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold">Ver Partida</a>
-                    </div>
-                `;
-      });
-      this.winnersList.innerHTML = html;
+      this.displayActiveGames(activeGames);
+      this.displayWinners(winners);
     } catch (error) {
-      console.error("Error fetching winners:", error);
+      console.error("Error fetching games:", error);
+      this.activeGamesList.innerHTML =
+        '<p class="text-center text-red-500">No se pudieron cargar las partidas activas.</p>';
       this.winnersList.innerHTML =
         '<p class="text-center text-red-500">No se pudo cargar el historial.</p>';
     }
+  },
+
+  displayActiveGames(games) {
+    if (games.length === 0) {
+      this.activeGamesList.innerHTML =
+        '<p class="text-center text-gray-500">No hay partidas activas en este momento.</p>';
+      return;
+    }
+    games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+    let html = "";
+    const baseUrl =
+      window.location.origin +
+      window.location.pathname.replace("admin.html", "");
+    games.forEach((game) => {
+      const date = game.createdAt.toDate().toLocaleString("es-MX");
+      const adminUrl = `${baseUrl}juego.html?id=${game.id}&token=${game.config.adminToken}`;
+      const playerUrl = `${baseUrl}juego.html?id=${game.id}`;
+      html += `
+                <div class="bg-blue-50 p-3 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-blue-800">Partida de ${game.players.length} jugador(es)</p>
+                        <p class="text-xs text-gray-500">Fecha: ${date}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="${adminUrl}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold">Continuar</a>
+                        <div class="relative">
+                             <button class="copy-active-link-btn p-2 hover:bg-gray-200 rounded-full" title="Copiar enlace para jugadores" data-player-url="${playerUrl}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                            <p class="copy-feedback-list absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-green-600 h-4 w-28"></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+    });
+    this.activeGamesList.innerHTML = html;
+  },
+
+  displayWinners(games) {
+    if (games.length === 0) {
+      this.winnersList.innerHTML =
+        '<p class="text-center text-gray-500">Aún no hay ganadores registrados.</p>';
+      return;
+    }
+    games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+    let html = "";
+    const baseUrl =
+      window.location.origin +
+      window.location.pathname.replace("admin.html", "");
+    games.forEach((game) => {
+      const date = game.createdAt.toDate().toLocaleString("es-MX");
+      const gameUrl = `${baseUrl}juego.html?id=${game.id}`;
+      html += `
+                <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-emerald-600">${game.winner.name}</p>
+                        <p class="text-xs text-gray-500">Fecha: ${date}</p>
+                    </div>
+                    <a href="${gameUrl}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold">Ver Partida</a>
+                </div>
+            `;
+    });
+    this.winnersList.innerHTML = html;
   },
 
   async handleChangePassword() {
@@ -406,10 +487,10 @@ const uiAdmin = {
       const gameUrl = `${baseUrl}juego.html?id=${gameId}`;
       const adminUrl = `${gameUrl}&token=${adminToken}`;
 
-      this.gameLinkInput.value = gameUrl;
+      this.copyLinkBtn.dataset.playerUrl = gameUrl;
       this.goToGameBtn.href = adminUrl;
       this.gameLinkContainer.classList.remove("hidden");
-      this.fetchAndDisplayWinners();
+      this.loadGames();
     } catch (error) {
       console.error("Error al crear la partida:", error);
       alert("No se pudo crear la partida. Revisa la consola.");
