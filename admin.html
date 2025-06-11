@@ -43,11 +43,21 @@
         </p>
       </div>
 
-      <!-- Panel de Configuración (Oculto por defecto) -->
+      <!-- Panel de Configuración -->
       <div
         id="config-section"
         class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg hidden"
       >
+        <!-- Botón para cambiar contraseña -->
+        <div class="text-right mb-4">
+          <button
+            id="show-password-modal-btn"
+            class="text-sm text-sky-600 hover:underline"
+          >
+            Cambiar Contraseña
+          </button>
+        </div>
+
         <div class="grid md:grid-cols-2 gap-8">
           <div>
             <h2 class="text-xl font-bold text-amber-700 mb-4">
@@ -103,9 +113,9 @@
         <div id="player-names-container" class="mt-6"></div>
         <button
           id="create-game-btn"
-          class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors mt-8"
+          class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 mt-8"
         >
-          Crear Partida y Obtener Enlace
+          Crear Partida
         </button>
         <div
           id="game-link-container"
@@ -127,6 +137,54 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para Cambiar Contraseña -->
+    <div
+      id="password-modal"
+      class="hidden fixed inset-0 flex items-center justify-center p-4 modal-background"
+    >
+      <div class="bg-white max-w-sm w-full rounded-xl shadow-2xl p-8">
+        <h2 class="text-2xl font-bold text-center text-amber-700 mb-6">
+          Cambiar Contraseña
+        </h2>
+        <div>
+          <label for="new-password" class="block text-sm font-medium"
+            >Nueva Contraseña</label
+          >
+          <input
+            type="password"
+            id="new-password"
+            class="mt-1 w-full p-2 border rounded-lg"
+          />
+        </div>
+        <div class="mt-4">
+          <label for="confirm-password" class="block text-sm font-medium"
+            >Confirmar Contraseña</label
+          >
+          <input
+            type="password"
+            id="confirm-password"
+            class="mt-1 w-full p-2 border rounded-lg"
+          />
+        </div>
+        <p id="password-change-status" class="text-center text-sm mt-4"></p>
+        <div class="flex gap-4 mt-6">
+          <button
+            id="cancel-password-change-btn"
+            class="w-full bg-gray-500 text-white py-2 rounded-lg font-bold hover:bg-gray-600"
+          >
+            Cancelar
+          </button>
+          <button
+            id="confirm-password-change-btn"
+            class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="admin.js"></script>
   </body>
 </html>

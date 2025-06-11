@@ -20,9 +20,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// --- Contraseña para el panel de admin ---
-const ADMIN_PASSWORD = "loteria2025";
-// -----------------------------------------
+// --- Funciones de Criptografía ---
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+}
 
 const gameLogic = {
   fullDeck: Array.from({ length: 54 }, (_, i) => ({
@@ -60,13 +68,13 @@ const gameLogic = {
 };
 
 const uiAdmin = {
+  // Selectores
   loginSection: document.getElementById("login-section"),
   configSection: document.getElementById("config-section"),
   passwordInput: document.getElementById("password"),
   loginBtn: document.getElementById("login-btn"),
   errorMessage: document.getElementById("error-message"),
   subtitle: document.getElementById("subtitle"),
-
   rowsInput: document.getElementById("rows"),
   colsInput: document.getElementById("cols"),
   totalImagesSpan: document.getElementById("total-images"),
@@ -77,25 +85,67 @@ const uiAdmin = {
   gameLinkInput: document.getElementById("game-link"),
   goToGameBtn: document.getElementById("go-to-game-btn"),
 
+  // Selectores del Modal de Contraseña
+  passwordModal: document.getElementById("password-modal"),
+  showPasswordModalBtn: document.getElementById("show-password-modal-btn"),
+  cancelPasswordChangeBtn: document.getElementById(
+    "cancel-password-change-btn"
+  ),
+  confirmPasswordChangeBtn: document.getElementById(
+    "confirm-password-change-btn"
+  ),
+  newPasswordInput: document.getElementById("new-password"),
+  confirmPasswordInput: document.getElementById("confirm-password"),
+  passwordChangeStatus: document.getElementById("password-change-status"),
+
   init() {
-    this.loginBtn.addEventListener("click", this.handleLogin);
+    this.loginBtn.addEventListener("click", this.handleLogin.bind(this));
     this.passwordInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") this.handleLogin();
     });
   },
 
-  handleLogin() {
-    if (this.passwordInput.value === ADMIN_PASSWORD) {
-      this.loginSection.classList.add("hidden");
-      this.configSection.classList.remove("hidden");
-      this.subtitle.textContent = "Configura una nueva partida de Lotería";
-      this.initPanel();
-    } else {
+  async handleLogin() {
+    const inputPassword = this.passwordInput.value;
+    if (!inputPassword) return;
+
+    this.loginBtn.disabled = true;
+    this.loginBtn.textContent = "Verificando...";
+    this.errorMessage.classList.add("hidden");
+
+    try {
+      const securityRef = doc(db, "app_config", "security");
+      const docSnap = await getDoc(securityRef);
+
+      if (docSnap.exists()) {
+        const storedHash = docSnap.data().admin_password_hash;
+        const inputHash = await hashPassword(inputPassword);
+
+        if (inputHash === storedHash) {
+          this.loginSection.classList.add("hidden");
+          this.configSection.classList.remove("hidden");
+          this.subtitle.textContent = "Configura una nueva partida de Lotería";
+          this.initPanel();
+        } else {
+          this.errorMessage.classList.remove("hidden");
+        }
+      } else {
+        this.errorMessage.textContent =
+          "Error de configuración. Contacta al soporte.";
+        this.errorMessage.classList.remove("hidden");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      this.errorMessage.textContent = "Error de conexión.";
       this.errorMessage.classList.remove("hidden");
+    } finally {
+      this.loginBtn.disabled = false;
+      this.loginBtn.textContent = "Entrar";
     }
   },
 
   initPanel() {
+    // ... Listeners del panel ...
     this.rowsInput.addEventListener("input", this.updateTotal);
     this.colsInput.addEventListener("input", this.updateTotal);
     this.playerCountInput.addEventListener(
@@ -103,10 +153,64 @@ const uiAdmin = {
       this.renderPlayerNameInputs
     );
     this.createGameBtn.addEventListener("click", this.createGame);
+
+    // Listeners del modal
+    this.showPasswordModalBtn.addEventListener("click", () =>
+      this.passwordModal.classList.remove("hidden")
+    );
+    this.cancelPasswordChangeBtn.addEventListener("click", () =>
+      this.passwordModal.classList.add("hidden")
+    );
+    this.confirmPasswordChangeBtn.addEventListener(
+      "click",
+      this.handleChangePassword.bind(this)
+    );
+
     this.renderPlayerNameInputs();
     this.updateTotal();
   },
 
+  async handleChangePassword() {
+    const newPass = this.newPasswordInput.value;
+    const confirmPass = this.confirmPasswordInput.value;
+    this.passwordChangeStatus.textContent = "";
+
+    if (!newPass || newPass !== confirmPass) {
+      this.passwordChangeStatus.textContent = "Las contraseñas no coinciden.";
+      this.passwordChangeStatus.classList.add("text-red-500");
+      return;
+    }
+
+    this.confirmPasswordChangeBtn.disabled = true;
+    this.confirmPasswordChangeBtn.textContent = "Guardando...";
+
+    try {
+      const newHash = await hashPassword(newPass);
+      const securityRef = doc(db, "app_config", "security");
+      await setDoc(securityRef, { admin_password_hash: newHash });
+
+      this.passwordChangeStatus.textContent =
+        "Contraseña actualizada con éxito.";
+      this.passwordChangeStatus.classList.remove("text-red-500");
+      this.passwordChangeStatus.classList.add("text-green-500");
+
+      setTimeout(() => {
+        this.passwordModal.classList.add("hidden");
+        this.passwordChangeStatus.textContent = "";
+        this.newPasswordInput.value = "";
+        this.confirmPasswordInput.value = "";
+      }, 2000);
+    } catch (error) {
+      console.error("Password change error:", error);
+      this.passwordChangeStatus.textContent = "Error al guardar.";
+      this.passwordChangeStatus.classList.add("text-red-500");
+    } finally {
+      this.confirmPasswordChangeBtn.disabled = false;
+      this.confirmPasswordChangeBtn.textContent = "Guardar";
+    }
+  },
+
+  // ... (El resto de las funciones: updateTotal, renderPlayerNameInputs, createGame son iguales) ...
   updateTotal() {
     const rows = parseInt(uiAdmin.rowsInput.value, 10) || 1;
     const cols = parseInt(uiAdmin.colsInput.value, 10) || 1;
