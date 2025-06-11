@@ -6,6 +6,7 @@ import {
   setDoc,
   getDoc,
   collection,
+  getDocs,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
@@ -153,6 +154,37 @@ const uiAdmin = {
     this.passwordInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") this.handleLogin();
     });
+    this.checkSession();
+  },
+
+  async checkSession() {
+    const sessionString = localStorage.getItem("loteriaAdminSession");
+    if (!sessionString) return;
+
+    const session = JSON.parse(sessionString);
+    if (new Date().getTime() > session.expires) {
+      localStorage.removeItem("loteriaAdminSession");
+      return;
+    }
+
+    try {
+      const securityRef = doc(db, "app_config", "security");
+      const docSnap = await getDoc(securityRef);
+      if (
+        docSnap.exists() &&
+        docSnap.data().admin_password_hash === session.token
+      ) {
+        this.loginSection.classList.add("hidden");
+        this.configSection.classList.remove("hidden");
+        this.subtitle.textContent =
+          "Configura o revisa el historial de partidas.";
+        this.initPanel();
+      } else {
+        localStorage.removeItem("loteriaAdminSession");
+      }
+    } catch (error) {
+      console.error("Error checking session:", error);
+    }
   },
 
   async handleLogin() {
@@ -170,6 +202,13 @@ const uiAdmin = {
         const storedHash = docSnap.data().admin_password_hash;
         const inputHash = await hashPassword(inputPassword);
         if (inputHash === storedHash) {
+          const sevenDays = 7 * 24 * 60 * 60 * 1000;
+          const session = {
+            token: storedHash,
+            expires: new Date().getTime() + sevenDays,
+          };
+          localStorage.setItem("loteriaAdminSession", JSON.stringify(session));
+
           this.loginSection.classList.add("hidden");
           this.configSection.classList.remove("hidden");
           this.subtitle.textContent =
@@ -200,7 +239,6 @@ const uiAdmin = {
     );
     this.createGameBtn.addEventListener("click", () => this.createGame());
     this.copyLinkBtn.addEventListener("click", () => this.copyGameLink());
-
     this.showPasswordModalBtn.addEventListener("click", () =>
       this.passwordModal.classList.remove("hidden")
     );
@@ -229,11 +267,15 @@ const uiAdmin = {
     this.winnersList.innerHTML =
       '<p class="text-center text-gray-500">Cargando historial...</p>';
     try {
-      const q = query(collection(db, "games"), where("winner", "!=", null));
-      const querySnapshot = await getDocs(q);
+      const gamesCollectionRef = collection(db, "games");
+      const querySnapshot = await getDocs(gamesCollectionRef);
+
       const winners = [];
       querySnapshot.forEach((doc) => {
-        winners.push({ id: doc.id, ...doc.data() });
+        const gameData = doc.data();
+        if (gameData.winner && gameData.winner.name) {
+          winners.push({ id: doc.id, ...gameData });
+        }
       });
 
       if (winners.length === 0) {
@@ -327,7 +369,7 @@ const uiAdmin = {
     this.createGameBtn.textContent = "Creando...";
 
     const gameId = doc(collection(db, "games")).id;
-    const adminToken = crypto.randomUUID(); // Generar token seguro
+    const adminToken = crypto.randomUUID();
     const rows = parseInt(this.rowsInput.value, 10);
     const cols = parseInt(this.colsInput.value, 10);
     const nameInputs = document.querySelectorAll(".player-name-input");
@@ -347,7 +389,7 @@ const uiAdmin = {
       config: {
         rows,
         cols,
-        adminToken, // Guardar el token en la configuración
+        adminToken,
       },
       players,
       deck: gameLogic.shuffleDeck(),
@@ -358,14 +400,14 @@ const uiAdmin = {
 
     try {
       await setDoc(doc(db, "games", gameId), gameData);
-      const baseUrl =
-        window.location.origin +
-        window.location.pathname.replace("admin.html", "");
+      const path = window.location.pathname;
+      const basePath = path.substring(0, path.lastIndexOf("/") + 1);
+      const baseUrl = window.location.origin + basePath;
       const gameUrl = `${baseUrl}juego.html?id=${gameId}`;
-      const adminUrl = `${gameUrl}&token=${adminToken}`; // Enlace de admin con el token
+      const adminUrl = `${gameUrl}&token=${adminToken}`;
 
-      this.gameLinkInput.value = gameUrl; // El enlace para jugadores no tiene token
-      this.goToGameBtn.href = adminUrl; // El botón para el admin sí
+      this.gameLinkInput.value = gameUrl;
+      this.goToGameBtn.href = adminUrl;
       this.gameLinkContainer.classList.remove("hidden");
       this.fetchAndDisplayWinners();
     } catch (error) {
