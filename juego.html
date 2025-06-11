@@ -13,13 +13,23 @@
         <h1 class="title">Lotería Mexicana</h1>
       </header>
 
-      <div id="loading-state" class="text-center">
-        <p class="text-xl">Cargando partida...</p>
+      <!-- Vista de 'Próximamente' o 'No Encontrado' -->
+      <div id="placeholder-view" class="text-center">
+        <img
+          src="https://placehold.co/300x150/f9fafb/92400e?text=Tu+Logo+Aquí"
+          alt="Logo"
+          class="mx-auto mb-6 rounded-lg"
+        />
+        <h2 class="text-4xl font-bold text-gray-700">Próximamente</h2>
+        <p class="text-xl text-gray-500 mt-2">
+          Una nueva partida comenzará pronto. ¡Espera el enlace del
+          administrador!
+        </p>
       </div>
 
+      <!-- Vista del Juego (Oculta por defecto) -->
       <div id="game-state" class="hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <!-- Columna del Cantor -->
           <div
             class="md:col-span-1 bg-white p-6 rounded-xl shadow-lg flex flex-col items-center"
           >
@@ -40,8 +50,6 @@
               ¡Corre y se va!
             </button>
           </div>
-
-          <!-- Columna de Cartillas -->
           <div class="md:col-span-3">
             <h2 class="text-3xl font-bold text-center mb-6 text-amber-800">
               Cartillas en Juego
@@ -49,9 +57,7 @@
             <div
               id="boards-container"
               class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-            >
-              <!-- Las cartillas se renderizan aquí -->
-            </div>
+            ></div>
           </div>
         </div>
       </div>
@@ -75,9 +81,7 @@
           <div
             id="winning-board"
             class="grid grid-cols-4 gap-2 max-w-xs mx-auto my-6 p-2 bg-amber-100 border-4 border-amber-500 rounded-lg"
-          >
-            <!-- Cartilla ganadora -->
-          </div>
+          ></div>
           <p class="text-gray-600">La partida ha terminado.</p>
         </div>
       </div>

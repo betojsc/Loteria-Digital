@@ -20,7 +20,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Lógica del juego (adaptada para el admin)
+// --- Contraseña para el panel de admin ---
+const ADMIN_PASSWORD = "loteria2025";
+// -----------------------------------------
+
 const gameLogic = {
   fullDeck: Array.from({ length: 54 }, (_, i) => ({
     id: i + 1,
@@ -56,8 +59,14 @@ const gameLogic = {
   },
 };
 
-// Lógica de la UI del admin
 const uiAdmin = {
+  loginSection: document.getElementById("login-section"),
+  configSection: document.getElementById("config-section"),
+  passwordInput: document.getElementById("password"),
+  loginBtn: document.getElementById("login-btn"),
+  errorMessage: document.getElementById("error-message"),
+  subtitle: document.getElementById("subtitle"),
+
   rowsInput: document.getElementById("rows"),
   colsInput: document.getElementById("cols"),
   totalImagesSpan: document.getElementById("total-images"),
@@ -69,6 +78,24 @@ const uiAdmin = {
   goToGameBtn: document.getElementById("go-to-game-btn"),
 
   init() {
+    this.loginBtn.addEventListener("click", this.handleLogin);
+    this.passwordInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") this.handleLogin();
+    });
+  },
+
+  handleLogin() {
+    if (this.passwordInput.value === ADMIN_PASSWORD) {
+      this.loginSection.classList.add("hidden");
+      this.configSection.classList.remove("hidden");
+      this.subtitle.textContent = "Configura una nueva partida de Lotería";
+      this.initPanel();
+    } else {
+      this.errorMessage.classList.remove("hidden");
+    }
+  },
+
+  initPanel() {
     this.rowsInput.addEventListener("input", this.updateTotal);
     this.colsInput.addEventListener("input", this.updateTotal);
     this.playerCountInput.addEventListener(
@@ -77,17 +104,19 @@ const uiAdmin = {
     );
     this.createGameBtn.addEventListener("click", this.createGame);
     this.renderPlayerNameInputs();
+    this.updateTotal();
   },
 
   updateTotal() {
-    const rows = parseInt(uiAdmin.rowsInput.value, 10);
-    const cols = parseInt(uiAdmin.colsInput.value, 10);
+    const rows = parseInt(uiAdmin.rowsInput.value, 10) || 1;
+    const cols = parseInt(uiAdmin.colsInput.value, 10) || 1;
     uiAdmin.totalImagesSpan.textContent = rows * cols;
   },
 
   renderPlayerNameInputs() {
-    const count = parseInt(uiAdmin.playerCountInput.value, 10);
-    let html = "";
+    const count = parseInt(uiAdmin.playerCountInput.value, 10) || 1;
+    let html =
+      '<label class="block text-sm font-semibold text-gray-800 mb-2">Nombres de Jugadores</label>';
     for (let i = 0; i < count; i++) {
       html += `<input type="text" class="player-name-input w-full p-2 border rounded-lg mt-2" placeholder="Nombre Jugador ${
         i + 1
@@ -100,7 +129,7 @@ const uiAdmin = {
     uiAdmin.createGameBtn.disabled = true;
     uiAdmin.createGameBtn.textContent = "Creando...";
 
-    const gameId = doc(collection(db, "games")).id; // Genera un ID único
+    const gameId = doc(collection(db, "games")).id;
     const rows = parseInt(uiAdmin.rowsInput.value, 10);
     const cols = parseInt(uiAdmin.colsInput.value, 10);
     const nameInputs = document.querySelectorAll(".player-name-input");
@@ -117,10 +146,7 @@ const uiAdmin = {
     }));
 
     const gameData = {
-      config: {
-        rows,
-        cols,
-      },
+      config: { rows, cols },
       players,
       deck: gameLogic.shuffleDeck(),
       calledCards: [],
@@ -149,10 +175,3 @@ const uiAdmin = {
 };
 
 uiAdmin.init();
-// Helper para Firestore 9+
-function collection(db, path) {
-  const { collection: col } = import(
-    "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"
-  );
-  return col(db, path);
-}

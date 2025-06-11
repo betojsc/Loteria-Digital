@@ -7,25 +7,55 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="container mx-auto p-8">
       <header class="text-center mb-8">
         <h1 class="title">Panel de Administrador</h1>
-        <p class="text-gray-600">Configura una nueva partida de Lotería</p>
+        <p class="text-gray-600" id="subtitle">
+          Ingresa la contraseña para configurar una partida.
+        </p>
       </header>
 
-      <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+      <!-- Formulario de Contraseña -->
+      <div
+        id="login-section"
+        class="max-w-sm mx-auto bg-white p-8 rounded-xl shadow-lg"
+      >
+        <label for="password" class="block text-sm font-medium text-gray-700"
+          >Contraseña</label
+        >
+        <input
+          type="password"
+          id="password"
+          class="mt-1 w-full p-2 border rounded-lg"
+        />
+        <button
+          id="login-btn"
+          class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700 transition-colors mt-4"
+        >
+          Entrar
+        </button>
+        <p
+          id="error-message"
+          class="text-red-500 text-sm mt-2 text-center hidden"
+        >
+          Contraseña incorrecta.
+        </p>
+      </div>
+
+      <!-- Panel de Configuración (Oculto por defecto) -->
+      <div
+        id="config-section"
+        class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg hidden"
+      >
         <div class="grid md:grid-cols-2 gap-8">
-          <!-- Configuración de Cartilla -->
           <div>
             <h2 class="text-xl font-bold text-amber-700 mb-4">
               Tamaño de la Cartilla
             </h2>
             <div class="flex items-center space-x-4">
               <div>
-                <label
-                  for="rows"
-                  class="block text-sm font-medium text-gray-700"
+                <label for="rows" class="block text-sm font-medium"
                   >Filas</label
                 >
                 <input
@@ -38,9 +68,7 @@
                 />
               </div>
               <div>
-                <label
-                  for="cols"
-                  class="block text-sm font-medium text-gray-700"
+                <label for="cols" class="block text-sm font-medium"
                   >Columnas</label
                 >
                 <input
@@ -54,15 +82,12 @@
               </div>
             </div>
             <p class="text-xs text-gray-500 mt-2">
-              Total de imágenes: <span id="total-images">4</span>. Máximo 12.
+              Total: <span id="total-images">4</span> imágenes. Máx: 12.
             </p>
           </div>
-          <!-- Configuración de Jugadores -->
           <div>
             <h2 class="text-xl font-bold text-amber-700 mb-4">Jugadores</h2>
-            <label
-              for="player-count"
-              class="block text-sm font-medium text-gray-700"
+            <label for="player-count" class="block text-sm font-medium"
               >¿Cuántos jugadores?</label
             >
             <input
