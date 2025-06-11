@@ -131,6 +131,7 @@ const uiAdmin = {
           this.subtitle.textContent = "Configura una nueva partida de Lotería";
           this.initPanel();
         } else {
+          this.errorMessage.textContent = "Error de contraseña.";
           this.errorMessage.classList.remove("hidden");
         }
       } else {
