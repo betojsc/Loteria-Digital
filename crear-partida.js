@@ -121,6 +121,8 @@ const customGameUI = {
   startGameBtn: document.getElementById("start-game-btn"),
   saveFeedback: document.getElementById("save-feedback"),
   deleteDraftBtn: document.getElementById("delete-draft-btn"),
+  addBoardCountInput: document.getElementById("add-board-count"),
+  addBoardsBtn: document.getElementById("add-boards-btn"),
   gameLinkContainer: document.getElementById("game-link-container"),
 
   draftData: null,
@@ -142,6 +144,7 @@ const customGameUI = {
       this.createGameFromDraft()
     );
     this.deleteDraftBtn.addEventListener("click", () => this.deleteDraft());
+    this.addBoardsBtn.addEventListener("click", () => this.addMoreBoards());
   },
 
   async loadDraft(draftId) {
@@ -178,12 +181,31 @@ const customGameUI = {
 
     this.draftData = {
       boards: gameLogic.generatePlayerBoards(boardCount, rows, cols),
-      config: { rows, cols },
+      config: { rows, cols, adminToken: crypto.randomUUID() },
     };
 
     this.initialSetup.classList.add("hidden");
     this.assignNamesSection.classList.remove("hidden");
     this.displayBoardsForNaming();
+  },
+
+  addMoreBoards() {
+    const count = parseInt(this.addBoardCountInput.value, 10);
+    if (isNaN(count) || count < 1) {
+      alert("Por favor, introduce un número válido de cartillas para añadir.");
+      return;
+    }
+
+    const { rows, cols } = this.draftData.config;
+    const newBoards = gameLogic.generatePlayerBoards(count, rows, cols);
+
+    this.draftData.boards.push(...newBoards);
+    this.displayBoardsForNaming();
+
+    this.saveFeedback.textContent = `¡Se añadieron ${count} cartillas!`;
+    setTimeout(() => {
+      this.saveFeedback.textContent = "";
+    }, 2500);
   },
 
   displayBoardsForNaming() {
@@ -221,7 +243,6 @@ const customGameUI = {
     if (!this.draftId) {
       this.draftId = doc(collection(db, "draft_games")).id;
       this.draftData.createdAt = new Date();
-      this.draftData.config.adminToken = crypto.randomUUID();
     }
 
     try {

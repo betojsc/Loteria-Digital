@@ -33,7 +33,7 @@
                   type="number"
                   id="rows"
                   value="2"
-                  min="1"
+                  min="2"
                   max="4"
                   class="mt-1 w-full p-2 border rounded-lg"
                 />
@@ -44,7 +44,7 @@
                   type="number"
                   id="cols"
                   value="2"
-                  min="1"
+                  min="2"
                   max="3"
                   class="mt-1 w-full p-2 border rounded-lg"
                 />
@@ -57,7 +57,7 @@
             <input
               type="number"
               id="board-count"
-              value="5"
+              value="10"
               min="2"
               max="50"
               class="mt-2 w-full p-2 border rounded-lg"
@@ -80,6 +80,29 @@
           id="generated-boards-container"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         ></div>
+
+        <div class="mt-8 p-6 bg-gray-50 rounded-xl border">
+          <h3 class="text-lg font-semibold text-center text-amber-700">
+            ¿Quieres más cartillas?
+          </h3>
+          <div class="flex items-center justify-center gap-4 mt-4">
+            <input
+              type="number"
+              id="add-board-count"
+              value="5"
+              min="1"
+              max="50"
+              class="w-24 p-2 border rounded-lg text-center"
+            />
+            <button
+              id="add-boards-btn"
+              class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700"
+            >
+              Añadir
+            </button>
+          </div>
+        </div>
+
         <div
           class="text-center mt-8 flex flex-col md:flex-row justify-center items-center gap-4"
         >
