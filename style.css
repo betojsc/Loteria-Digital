@@ -1,9 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lobster&display=swap");
 
+:root {
+  --header-height: 4rem;
+  --cantor-height: 6rem;
+}
+
 .title {
   font-family: "Lobster", cursive;
   font-size: 3rem;
-  color: #92400e; /* amber-800 */
+  color: #92400e;
 }
 
 .title-font {
@@ -13,7 +18,7 @@
 .card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 0.5rem;
   display: block;
   transition: transform 0.2s;
@@ -21,25 +26,20 @@
 
 .marked {
   border-radius: 0.5rem;
-  border: 4px solid #10b981; /* emerald-500 */
+  border: 4px solid #10b981;
   box-shadow: 0 0 15px #10b981;
+  position: relative;
 }
 
 .marked::after {
-  content: "X";
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 900;
-  text-shadow: 0 0 5px black;
-  backdrop-filter: grayscale(30%);
+  width: 100%;
+  height: 100%;
+  background: url("./assets/images/Cafe.png") center center no-repeat;
+  background-size: contain;
   border-radius: 0.5rem;
 }
 
@@ -47,3 +47,43 @@
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
 }
+
+/* MOBILE: fixed cantor and header, only boards scroll */
+@media (max-width: 767px) {
+  /* Cantor fixed at top */
+  #cantor-section {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--cantor-height);
+    background-color: white;
+    z-index: 1000;
+    padding: 1rem;
+  }
+  /* Header fixed below cantor */
+  header.text-center.mb-4.md\:mb-8 {
+    position: fixed;
+    top: var(--cantor-height);
+    left: 0;
+    right: 0;
+    margin: 10;
+    padding-top: 2rem;
+  }
+  /* Content start below header + cantor */
+  #game-container {
+    padding-top: calc(var(--cantor-height) + var(--header-height));
+  }
+  #cantor-section {
+    --cantor-height: 8rem;
+  }
+  /* Boards scrollable under fixed sections */
+  #boards-overview,
+  #mobile-focus-view {
+    margin-top: 0;
+    overflow-y: auto;
+    max-height: calc(100vh - var(--cantor-height) - var(--header-height));
+  }
+}
+
+/* DESKTOP: unchanged behavior */
