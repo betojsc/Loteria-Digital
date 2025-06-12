@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import {
   getFirestore,
@@ -7,19 +6,15 @@ import {
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDFn4Dntx2GbWTL9r6S0AlKDYCNfs8x22s",
   authDomain: "loteria-digital.firebaseapp.com",
   projectId: "loteria-digital",
-  storageBucket: "loteria-digital.firebasestorage.app",
+  storageBucket: "loteria-digital.appspot.com",
   messagingSenderId: "274858696939",
   appId: "1:274858696939:web:39925a407bd7aa54665eae",
   measurementId: "G-790JYFXNQ2",
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -92,7 +87,7 @@ const uiGame = {
       this.winningBoard.innerHTML += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
     });
     this.winnerModal.classList.remove("hidden");
-    this.winnerModal.classList.add("active"); // Previene que la animación se repita
+    this.winnerModal.classList.add("active");
     this.launchConfetti();
   },
 
@@ -111,13 +106,11 @@ const uiGame = {
         return clearInterval(interval);
       }
       const particleCount = 50 * (timeLeft / duration);
-      // Confeti desde la izquierda
       confetti({
         ...defaults,
         particleCount,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
       });
-      // Confeti desde la derecha
       confetti({
         ...defaults,
         particleCount,
@@ -184,7 +177,11 @@ function main() {
     (doc) => {
       if (doc.exists()) {
         currentGameData = doc.data();
-        if (token && token === currentGameData.config.adminToken) {
+        if (
+          token &&
+          currentGameData.config &&
+          token === currentGameData.config.adminToken
+        ) {
           uiGame.initAdminControls(gameId);
         }
         uiGame.renderGame(currentGameData);

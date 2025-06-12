@@ -6,7 +6,6 @@
     <title>Lotería Mexicana</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css" />
-    <!-- Librería para la animación de confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   </head>
   <body class="bg-gray-100">
@@ -15,12 +14,10 @@
         <h1 class="title">Lotería Mexicana</h1>
       </header>
 
-      <!-- Vista de 'Cargando' -->
       <div id="loading-view" class="text-center">
         <h2 class="text-2xl font-bold text-gray-600">Cargando partida...</h2>
       </div>
 
-      <!-- Vista de 'Próximamente' o 'No Encontrado' (oculta por defecto) -->
       <div id="placeholder-view" class="text-center hidden">
         <img
           src="https://placehold.co/300x150/f9fafb/92400e?text=Tu+Logo+Aquí"
@@ -33,7 +30,6 @@
         </p>
       </div>
 
-      <!-- Vista del Juego (Oculta por defecto) -->
       <div id="game-state" class="hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div
@@ -68,7 +64,6 @@
         </div>
       </div>
 
-      <!-- Modal de Ganador -->
       <div
         id="winner-modal"
         class="hidden fixed inset-0 flex items-center justify-center p-4 modal-background"
