@@ -163,16 +163,16 @@ const customGameUI = {
     const rows = parseInt(this.rowsInput.value, 10);
     const cols = parseInt(this.colsInput.value, 10);
     const boardCount = parseInt(this.boardCountInput.value, 10);
-    if (
-      isNaN(rows) ||
-      isNaN(cols) ||
-      isNaN(boardCount) ||
-      rows < 2 ||
-      cols < 2 ||
-      rows > 4 ||
-      cols > 3
-    ) {
-      alert("Valores inválidos. Filas (2-4), Columnas (2-3).");
+
+    if (isNaN(rows) || isNaN(cols) || isNaN(boardCount)) {
+      alert("Por favor, introduce valores numéricos válidos.");
+      return;
+    }
+
+    if (rows < 2 || rows > 4 || cols < 2 || cols > 3 || rows * cols > 12) {
+      alert(
+        "El tamaño de la cartilla no es válido. Filas debe ser entre 2 y 4. Columnas debe ser entre 2 y 3."
+      );
       return;
     }
 
