@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="bg-gray-100 flex items-center justify-center min-h-screen py-12">
+  <body class="flex items-center justify-center min-h-screen py-12">
     <div class="container mx-auto p-8">
       <header class="text-center mb-8">
         <h1 class="title">Panel de Administrador</h1>
-        <p class="text-gray-600" id="subtitle">
+        <p id="subtitle" class="mt-2" style="color: var(--text-dark)">
           Ingresa la contraseña para configurar una partida.
         </p>
       </header>
@@ -20,9 +20,12 @@
         id="login-section"
         class="max-w-sm mx-auto bg-white p-8 rounded-xl shadow-lg"
       >
-        <label for="password" class="block text-sm font-medium text-gray-700"
-          >Contraseña</label
+        <label
+          for="password"
+          class="block text-sm font-medium text-[var(--text-dark)]"
         >
+          Contraseña
+        </label>
         <input
           type="password"
           id="password"
@@ -30,7 +33,7 @@
         />
         <button
           id="login-btn"
-          class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700 transition-colors mt-4"
+          class="w-full bg-[var(--dark-blue)] text-white py-2 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors mt-4"
         >
           Entrar
         </button>
@@ -47,18 +50,17 @@
         class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg hidden"
       >
         <div class="flex justify-between items-center mb-8">
-          <h2 class="text-2xl font-bold text-amber-800">Panel de Control</h2>
+          <h2 class="text-2xl font-bold" style="color: var(--dark-blue)">
+            Panel de Control
+          </h2>
           <div class="flex items-center space-x-4">
             <button
               id="show-password-modal-btn"
-              class="text-sm text-sky-600 hover:underline"
+              class="text-[var(--dark-blue)] hover:underline"
             >
               Cambiar Contraseña
             </button>
-            <button
-              id="logout-btn"
-              class="text-sm text-red-600 hover:underline"
-            >
+            <button id="logout-btn" class="text-red-600 hover:underline">
               Cerrar Sesión
             </button>
           </div>
@@ -66,26 +68,33 @@
 
         <a
           href="crear-partida.html"
-          class="block w-full text-center bg-purple-600 text-white py-4 rounded-lg font-bold hover:bg-purple-700 transition-colors text-xl"
-          >Crear Nueva Partida</a
+          class="block w-full text-center bg-[var(--dark-blue)] text-white py-4 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors text-xl"
         >
+          Crear Nueva Partida
+        </a>
 
         <div class="mt-12">
-          <h2 class="text-2xl font-bold text-amber-700 mb-4 text-center">
+          <h2
+            class="text-2xl font-bold mb-4 text-center text-[var(--dark-blue)]"
+          >
             Partidas en Borrador
           </h2>
           <div id="draft-games-list" class="space-y-3"></div>
         </div>
 
         <div class="mt-12">
-          <h2 class="text-2xl font-bold text-amber-700 mb-4 text-center">
+          <h2
+            class="text-2xl font-bold mb-4 text-center text-[var(--dark-blue)]"
+          >
             Partidas Activas
           </h2>
           <div id="active-games-list" class="space-y-3"></div>
         </div>
 
         <div class="mt-12">
-          <h2 class="text-2xl font-bold text-amber-700 mb-4 text-center">
+          <h2
+            class="text-2xl font-bold mb-4 text-center text-[var(--dark-blue)]"
+          >
             Historial de Ganadores
           </h2>
           <div id="winners-list" class="space-y-3"></div>
@@ -98,28 +107,42 @@
       class="hidden fixed inset-0 flex items-center justify-center p-4 modal-background"
     >
       <div class="bg-white max-w-sm w-full rounded-xl shadow-2xl p-8">
-        <h2 class="text-2xl font-bold text-center text-amber-700 mb-6">
+        <h2
+          class="text-2xl font-bold text-center mb-6"
+          style="color: var(--dark-blue)"
+        >
           Cambiar Contraseña
         </h2>
         <div>
-          <label for="new-password" class="block text-sm font-medium"
-            >Nueva Contraseña</label
-          ><input
+          <label
+            for="new-password"
+            class="block text-sm font-medium text-[var(--text-dark)]"
+          >
+            Nueva Contraseña
+          </label>
+          <input
             type="password"
             id="new-password"
             class="mt-1 w-full p-2 border rounded-lg"
           />
         </div>
         <div class="mt-4">
-          <label for="confirm-password" class="block text-sm font-medium"
-            >Confirmar Contraseña</label
-          ><input
+          <label
+            for="confirm-password"
+            class="block text-sm font-medium text-[var(--text-dark)]"
+          >
+            Confirmar Contraseña
+          </label>
+          <input
             type="password"
             id="confirm-password"
             class="mt-1 w-full p-2 border rounded-lg"
           />
         </div>
-        <p id="password-change-status" class="text-center text-sm mt-4"></p>
+        <p
+          id="password-change-status"
+          class="text-center text-sm mt-4 text-[var(--text-dark)]"
+        ></p>
         <div class="flex gap-4 mt-6">
           <button
             id="cancel-password-change-btn"
@@ -129,7 +152,7 @@
           </button>
           <button
             id="confirm-password-change-btn"
-            class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700"
+            class="w-full bg-[var(--dark-blue)] text-white py-2 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors"
           >
             Guardar
           </button>

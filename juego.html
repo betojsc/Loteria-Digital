@@ -9,8 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   </head>
   <body class="bg-gray-100">
-    <div class="container mx-auto p-4 md:p-8">
-      <header class="flex justify-center items-center gap-4 mb-4 md:mb-8">
+    <div class="container mx-auto p-4 md:p-8 flex flex-col h-screen">
+      <!-- Encabezado fijo -->
+      <header
+        class="flex-none flex justify-center items-center gap-4 mb-4 md:mb-8"
+      >
         <h1 class="title">Lotería</h1>
         <img
           src="./assets/images/logo_nice.png"
@@ -19,66 +22,68 @@
         />
       </header>
 
-      <div id="loading-view" class="text-center">
+      <!-- Vistas de carga y placeholder -->
+      <div id="loading-view" class="flex-none text-center">
         <h2 class="text-2xl font-bold" style="color: var(--dark-blue)">
           Cargando partida...
         </h2>
       </div>
-
-      <div id="placeholder-view" class="text-center hidden">
+      <div id="placeholder-view" class="flex-none text-center hidden">
         <h2 class="text-4xl font-bold text-gray-700">Próximamente</h2>
         <p class="text-xl text-gray-500 mt-2">
           Una nueva partida comenzará pronto o el enlace no es válido.
         </p>
       </div>
 
-      <!-- Contenedor Principal del Juego -->
-      <div id="game-container" class="hidden">
-        <div
+      <!-- Contenedor Principal: Cantor y Cartillas -->
+      <div
+        id="game-container"
+        class="hidden flex-1 flex flex-col md:flex-row overflow-hidden"
+      >
+        <!-- Módulo de El Cantor: ancho completo en móvil con mayor transparencia al hacer scroll, contenido centrado -->
+        <section
           id="cantor-section"
-          class="sticky top-0 z-20 p-2 bg-white/80 backdrop-blur-sm shadow-md md:static md:bg-transparent md:shadow-none md:p-0 flex items-center justify-between md:flex-col"
+          class="sticky top-0 z-20 w-full md:w-auto flex justify-center md:self-start flex-none p-2 bg-white/60 backdrop-blur-sm shadow-md md:flex-col"
         >
           <div
-            class="md:bg-white md:p-6 md:rounded-xl md:shadow-lg w-full flex items-center justify-between md:flex-col"
+            class="flex items-center justify-between md:flex-col md:bg-white md:p-6 md:rounded-xl md:shadow-lg w-auto"
           >
-            <h2
-              class="hidden md:block text-2xl font-bold mb-4"
-              style="color: var(--dark-blue)"
-            >
-              El Cantor
-            </h2>
+            <!-- Imagen o carta actual -->
             <div
               id="current-card-container"
-              class="w-20 h-28 md:w-full md:max-w-[200px] md:min-h-[280px] bg-gray-200 rounded-lg flex items-center justify-center p-1 md:p-2 md:mb-4"
+              class="w-22 h-28 md:w-auto md:max-w-[200px] md:min-h-[280px] bg-gray-200 rounded-lg flex items-center justify-center p-1 md:p-2 md:mb-4"
             >
               <span class="text-xs md:text-base text-gray-500 text-center"
                 >Esperando...</span
               >
             </div>
-            <div
-              class="flex flex-col items-center mx-4 flex-grow md:flex-grow-0"
-            >
+            <!-- Conteo de cartas restantes -->
+            <div class="flex flex-col items-center mx-4">
+              <!-- Título móvil arriba del conteo con id para JS -->
               <h2
-                class="md:hidden text-lg font-bold mb-1"
+                id="card-title"
+                class="block text-lg font-bold mb-1"
                 style="color: var(--dark-blue)"
               >
                 El Cantor
               </h2>
               <p class="text-sm text-gray-600">
-                Cartas restantes: <span id="deck-count">54</span>
+                Cartas restantes: <span id="deck-count">0</span>
               </p>
             </div>
+            <!-- Botón visible solo en modo admin (se muestra vía JS) -->
             <button
               id="call-card-btn"
-              class="hidden w-auto md:w-full text-white px-4 py-2 md:py-3 rounded-lg font-bold hover:opacity-90 transition-colors"
+              class="hidden w-full text-white px-4 py-2 md:py-3 rounded-lg font-bold hover:opacity-90 transition-colors"
               style="background-color: var(--dark-blue)"
             >
               Sacar carta
             </button>
           </div>
-        </div>
+        </section>
 
-        <div id="main-content" class="mt-4 md:mt-0 md:col-span-3">
+        <!-- Sección de Cartillas, solo esta área es scrollable -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-4">
           <div id="boards-overview">
             <h2
               class="text-3xl font-bold text-center mb-6"
@@ -95,6 +100,7 @@
             ></div>
           </div>
 
+          <!-- Vista Móvil Enfocada -->
           <div id="mobile-focus-view" class="hidden">
             <button
               id="show-all-boards-btn"
@@ -104,9 +110,10 @@
             </button>
             <div id="focused-board-container"></div>
           </div>
-        </div>
+        </main>
       </div>
 
+      <!-- Modal Ganador -->
       <div
         id="winner-modal"
         class="hidden fixed inset-0 flex items-center justify-center p-4 modal-background"
@@ -114,12 +121,16 @@
         <div
           class="bg-white max-w-lg w-full rounded-xl shadow-2xl p-8 text-center"
         >
-          <h2
-            class="text-5xl font-bold title-font"
-            style="color: var(--dark-blue)"
+          <header
+            class="flex-none flex justify-center items-center gap-4 mb-4 md:mb-8"
           >
-            ¡Lotería!
-          </h2>
+            <h1 class="title">Lotería</h1>
+            <img
+              src="./assets/images/logo_nice.png"
+              alt="Logo de NICE"
+              class="h-12"
+            />
+          </header>
           <p class="text-2xl mt-4">El ganador es:</p>
           <p
             id="winner-name"
@@ -129,7 +140,7 @@
             id="winning-board"
             class="grid grid-cols-4 gap-2 max-w-xs mx-auto my-6 p-2 bg-amber-100 border-4 border-amber-500 rounded-lg"
           ></div>
-          <p class="text-gray-600">La partida ha terminado.</p>
+          <p class="text-gray-600">¡Gracias por participar!</p>
         </div>
       </div>
     </div>

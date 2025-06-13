@@ -34,6 +34,7 @@ const uiGame = {
   focusedBoardContainer: document.getElementById("focused-board-container"),
   showAllBoardsBtn: document.getElementById("show-all-boards-btn"),
   currentCardContainer: document.getElementById("current-card-container"),
+  currentCardName: document.getElementById("card-title"),
   deckCountSpan: document.getElementById("deck-count"),
   callCardBtn: document.getElementById("call-card-btn"),
   winnerModal: document.getElementById("winner-modal"),
@@ -61,6 +62,7 @@ const uiGame = {
       calledCards.length > 0 ? calledCards[calledCards.length - 1] : null;
     if (currentCard) {
       this.currentCardContainer.innerHTML = `<img src="assets/images/${currentCard.img}" alt="${currentCard.name}" class="card-image">`;
+      this.currentCardName.textContent = currentCard.name;
     } else {
       this.currentCardContainer.innerHTML = `<span class="text-xs md:text-base text-gray-500 text-center">Esperando...</span>`;
     }
