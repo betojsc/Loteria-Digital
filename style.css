@@ -1,24 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lobster&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap");
 
 :root {
-  --header-height: 4rem;
-  --cantor-height: 6rem;
+  --dark-blue: #1d2b4a;
+  --light-blue: #a8c5d8;
+  --accent-gold: #ffd700;
+  --background-light: #f7f9fb;
+  --text-dark: #2c3e50;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background-light);
+  color: var(--text-dark);
 }
 
 .title {
-  font-family: "Lobster", cursive;
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
   font-size: 3rem;
-  color: #92400e;
+  color: var(--dark-blue);
+  letter-spacing: -0.05em;
 }
 
 .title-font {
-  font-family: "Lobster", cursive;
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
 }
 
 .card-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 0.5rem;
   display: block;
   transition: transform 0.2s;
@@ -26,9 +38,8 @@
 
 .marked {
   border-radius: 0.5rem;
-  border: 4px solid #10b981;
-  box-shadow: 0 0 15px #10b981;
-  position: relative;
+  border: 4px solid var(--accent-gold);
+  box-shadow: 0 0 15px var(--accent-gold);
 }
 
 .marked::after {
@@ -47,43 +58,3 @@
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
 }
-
-/* MOBILE: fixed cantor and header, only boards scroll */
-@media (max-width: 767px) {
-  /* Cantor fixed at top */
-  #cantor-section {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--cantor-height);
-    background-color: white;
-    z-index: 1000;
-    padding: 1rem;
-  }
-  /* Header fixed below cantor */
-  header.text-center.mb-4.md\:mb-8 {
-    position: fixed;
-    top: var(--cantor-height);
-    left: 0;
-    right: 0;
-    margin: 10;
-    padding-top: 2rem;
-  }
-  /* Content start below header + cantor */
-  #game-container {
-    padding-top: calc(var(--cantor-height) + var(--header-height));
-  }
-  #cantor-section {
-    --cantor-height: 8rem;
-  }
-  /* Boards scrollable under fixed sections */
-  #boards-overview,
-  #mobile-focus-view {
-    margin-top: 0;
-    overflow-y: auto;
-    max-height: calc(100vh - var(--cantor-height) - var(--header-height));
-  }
-}
-
-/* DESKTOP: unchanged behavior */

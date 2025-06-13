@@ -356,15 +356,33 @@ const customGameUI = {
     const basePath = path.substring(0, path.lastIndexOf("/") + 1);
     const baseUrl = window.location.origin + basePath;
     const adminUrl = `${baseUrl}juego.html?id=${gameId}&token=${adminToken}`;
+    const playerUrl = `${baseUrl}juego.html?id=${gameId}`;
 
     this.gameLinkContainer.innerHTML = `
             <h3 class="font-bold text-2xl text-green-600">¡Partida Creada con Éxito!</h3>
-            <p class="mt-4">Ya puedes administrar la partida y compartir el enlace con los jugadores.</p>
-            <div class="mt-4">
-                <a href="${adminUrl}" target="_blank" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700">¡Ir a la Partida!</a>
+            <div class="flex justify-center items-center gap-4 mt-4">
+                <a href="${adminUrl}" target="_blank" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700">Ir a mi Partida</a>
+                <div class="relative">
+                    <button id="final-copy-btn" title="Copiar enlace para jugadores" class="p-3 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                    <p id="final-copy-feedback" class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-green-600 h-4 w-28"></p>
+                </div>
             </div>
         `;
     this.gameLinkContainer.classList.remove("hidden");
+
+    document.getElementById("final-copy-btn").addEventListener("click", (e) => {
+      navigator.clipboard.writeText(playerUrl).then(() => {
+        const feedback = document.getElementById("final-copy-feedback");
+        feedback.textContent = "¡Copiado!";
+        setTimeout(() => {
+          feedback.textContent = "";
+        }, 2500);
+      });
+    });
   },
 };
 customGameUI.init();
