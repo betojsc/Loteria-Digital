@@ -9,7 +9,6 @@ import {
   deleteDoc,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// --- PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyDFn4Dntx2GbWTL9r6S0AlKDYCNfs8x22s",
   authDomain: "loteria-digital.firebaseapp.com",
@@ -19,7 +18,6 @@ const firebaseConfig = {
   appId: "1:274858696939:web:39925a407bd7aa54665eae",
   measurementId: "G-790JYFXNQ2",
 };
-// -----------------------------------------
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -123,10 +121,12 @@ const customGameUI = {
   deleteDraftBtn: document.getElementById("delete-draft-btn"),
   addBoardCountInput: document.getElementById("add-board-count"),
   addBoardsBtn: document.getElementById("add-boards-btn"),
+  viewAvailableBtn: document.getElementById("view-available-btn"),
   gameLinkContainer: document.getElementById("game-link-container"),
 
   draftData: null,
   draftId: null,
+  nextBoardId: 1,
 
   init() {
     const params = new URLSearchParams(window.location.search);
@@ -155,7 +155,14 @@ const customGameUI = {
     const docSnap = await getDoc(draftRef);
     if (docSnap.exists()) {
       this.draftData = docSnap.data();
+      if (this.draftData.boards && this.draftData.boards.length > 0) {
+        const maxId = Math.max(...this.draftData.boards.map((b) => b.id || 0));
+        this.nextBoardId = maxId + 1;
+      } else {
+        this.nextBoardId = 1;
+      }
       this.displayBoardsForNaming();
+      this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
     } else {
       alert("Borrador no encontrado.");
       window.location.href = "admin.html";
@@ -179,9 +186,18 @@ const customGameUI = {
       return;
     }
 
+    this.nextBoardId = 1;
+    const generatedBoards = gameLogic.generatePlayerBoards(
+      boardCount,
+      rows,
+      cols
+    );
     this.draftData = {
-      boards: gameLogic.generatePlayerBoards(boardCount, rows, cols),
-      config: { rows, cols, adminToken: crypto.randomUUID() },
+      boards: generatedBoards.map((board) => ({
+        ...board,
+        id: this.nextBoardId++,
+      })),
+      config: { rows, cols },
     };
 
     this.initialSetup.classList.add("hidden");
@@ -197,9 +213,14 @@ const customGameUI = {
     }
 
     const { rows, cols } = this.draftData.config;
-    const newBoards = gameLogic.generatePlayerBoards(count, rows, cols);
+    const newBoardsData = gameLogic.generatePlayerBoards(count, rows, cols);
 
-    this.draftData.boards.push(...newBoards);
+    const newBoardsWithId = newBoardsData.map((board) => ({
+      ...board,
+      id: this.nextBoardId++,
+    }));
+
+    this.draftData.boards.push(...newBoardsWithId);
     this.displayBoardsForNaming();
 
     this.saveFeedback.textContent = `¡Se añadieron ${count} cartillas!`;
@@ -219,6 +240,9 @@ const customGameUI = {
         cardsHtml += `<div class="relative"><img src="assets/images/${card.img}" class="card-image"></div>`;
       });
       boardWrapper.innerHTML = `
+                <p class="text-center font-bold text-gray-700 mb-2">Cartilla #${
+                  boardData.id
+                }</p>
                 <div class="grid gap-2 mb-4" style="grid-template-columns: repeat(${
                   this.draftData.config.cols
                 }, 1fr)">${cardsHtml}</div>
@@ -243,12 +267,14 @@ const customGameUI = {
     if (!this.draftId) {
       this.draftId = doc(collection(db, "draft_games")).id;
       this.draftData.createdAt = new Date();
+      this.draftData.config.adminToken = crypto.randomUUID();
     }
 
     try {
       await setDoc(doc(db, "draft_games", this.draftId), this.draftData);
       this.saveFeedback.textContent = "¡Borrador guardado!";
       window.history.replaceState({}, "", `?draftId=${this.draftId}`);
+      this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
     } catch (error) {
       console.error("Error saving draft:", error);
       this.saveFeedback.textContent = "Error al guardar.";
@@ -265,16 +291,12 @@ const customGameUI = {
     this.startGameBtn.disabled = true;
     this.startGameBtn.textContent = "Iniciando...";
 
-    const nameInputs = document.querySelectorAll(".player-name-input");
-    const players = [];
-    nameInputs.forEach((input, index) => {
-      if (input.value.trim() !== "") {
-        players.push({
-          name: input.value.trim(),
-          board: { cards: this.draftData.boards[index].cards, marked: [] },
-        });
-      }
-    });
+    const players = this.draftData.boards
+      .filter((board) => board.name && board.name.trim() !== "")
+      .map((board) => ({
+        name: board.name.trim(),
+        board: { cards: board.cards, marked: [] },
+      }));
 
     if (players.length < 2) {
       alert(
@@ -334,32 +356,15 @@ const customGameUI = {
     const basePath = path.substring(0, path.lastIndexOf("/") + 1);
     const baseUrl = window.location.origin + basePath;
     const adminUrl = `${baseUrl}juego.html?id=${gameId}&token=${adminToken}`;
-    const playerUrl = `${baseUrl}juego.html?id=${gameId}`;
 
     this.gameLinkContainer.innerHTML = `
             <h3 class="font-bold text-2xl text-green-600">¡Partida Creada con Éxito!</h3>
-            <div class="flex justify-center items-center gap-4 mt-4">
-                <a href="${adminUrl}" target="_blank" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700">Ir a mi Partida</a>
-                <div class="relative">
-                    <button id="final-copy-btn" title="Copiar enlace para jugadores" class="p-3 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                    </button>
-                    <p id="final-copy-feedback" class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-green-600 h-4 w-28"></p>
-                </div>
+            <p class="mt-4">Ya puedes administrar la partida y compartir el enlace con los jugadores.</p>
+            <div class="mt-4">
+                <a href="${adminUrl}" target="_blank" class="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700">¡Ir a la Partida!</a>
             </div>
         `;
     this.gameLinkContainer.classList.remove("hidden");
-    document.getElementById("final-copy-btn").addEventListener("click", (e) => {
-      navigator.clipboard.writeText(playerUrl).then(() => {
-        const feedback = document.getElementById("final-copy-feedback");
-        feedback.textContent = "¡Copiado!";
-        setTimeout(() => {
-          feedback.textContent = "";
-        }, 2500);
-      });
-    });
   },
 };
 customGameUI.init();

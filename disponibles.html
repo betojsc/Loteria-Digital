@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartillas Disponibles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+      <header class="text-center mb-8">
+        <h1 class="title mt-2">Cartillas Disponibles</h1>
+        <p class="text-gray-600">
+          Estas son las cartillas que aún no tienen un jugador asignado.
+        </p>
+      </header>
+
+      <div id="loading-view" class="text-center">
+        <h2 class="text-2xl font-bold text-gray-600">Cargando cartillas...</h2>
+      </div>
+
+      <div
+        id="available-boards-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <!-- Las cartillas disponibles se insertan aquí -->
+      </div>
+    </div>
+    <script type="module" src="disponibles.js"></script>
+  </body>
+</html>
