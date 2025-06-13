@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function moveToSlide(targetIndex) {
     if (slides.length === 0) return;
     const slideWidth = slides[0].getBoundingClientRect().width;
-    // Mueve el 'track' horizontalmente
     track.style.transform = `translateX(-${slideWidth * targetIndex}px)`;
     currentIndex = targetIndex;
     updateDots();
@@ -28,9 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Función para avanzar al siguiente slide automáticamente
   function autoPlay() {
-    if (slides.length === 0) return;
     let nextIndex = (currentIndex + 1) % slides.length;
     moveToSlide(nextIndex);
   }
@@ -66,13 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Reajustar en cambio de tamaño de ventana
   window.addEventListener("resize", () => {
-    if (slides.length === 0) return;
-    // Desactiva la transición temporalmente para un reajuste suave
     track.style.transition = "none";
     moveToSlide(currentIndex);
-    // Forzar un reflow para aplicar el cambio de posición inmediatamente
-    track.offsetHeight;
-    // Reactivar la transición
+    track.offsetHeight; // Forzar un reflow
     track.style.transition = "transform 0.8s ease-in-out";
   });
 
@@ -84,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carousel.addEventListener("focusout", startAutoPlay);
   }
 
-  // Iniciar el carrusel
+  // Iniciar
   if (slides.length > 0) {
     moveToSlide(0);
     startAutoPlay();
