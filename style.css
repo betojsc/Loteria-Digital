@@ -58,3 +58,19 @@ body {
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
 }
+
+body {
+  font-family: "Inter", sans-serif;
+}
+.carousel-container {
+  position: relative;
+  overflow: hidden; /* Oculta las imágenes que están fuera del contenedor */
+}
+.carousel-track {
+  display: flex;
+  transition: transform 0.8s ease-in-out; /* Animación de deslizamiento más suave */
+}
+.carousel-slide {
+  min-width: 100%;
+  box-sizing: border-box;
+}

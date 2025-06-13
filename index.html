@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NICE JOYERÍA Y ACCESORIOS | Catálogo</title>
+    <!-- Favicon Placeholder -->
+    <link rel="icon" href="./assets/images/favicon.ico" type="image/x-icon" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    />
+    <!-- Estilos del carrusel y de la página -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Header con logo y navegación -->
+    <header class="bg-white/80 backdrop-blur-sm shadow sticky top-0 z-50">
+      <div
+        class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between"
+      >
+        <!-- Logo -->
+        <img
+          src="./assets/images/logo_nice.png"
+          alt="Logo NICE"
+          class="h-12"
+          onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=NICE+Logo';"
+        />
+        <!-- Navegación -->
+        <nav class="space-x-6">
+          <a href="./juego.html" class="text-sm text-gray-800 hover:underline"
+            >Jugar</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <!-- Carrusel reemplazando el banner estático -->
+    <section id="galeria" class="py-8">
+      <div class="max-w-6xl mx-auto px-4">
+        <!-- Contenedor del Carrusel -->
+        <div
+          id="carousel"
+          class="carousel-container rounded-lg shadow-xl bg-white"
+        >
+          <!-- Pista del Carrusel -->
+          <div class="carousel-track">
+            <!-- Diapositiva 1 -->
+            <div class="carousel-slide">
+              <!-- MODIFICACIÓN: Cambiado h-auto a h-96 para una altura fija y responsiva -->
+              <img
+                src="https://placehold.co/1200x600/3498db/ffffff?text=Joyería+Exclusiva"
+                alt="Joyería Exclusiva"
+                class="w-full h-96 object-cover"
+              />
+            </div>
+            <!-- Diapositiva 2 -->
+            <div class="carousel-slide">
+              <img
+                src="https://placehold.co/1200x600/e74c3c/ffffff?text=Diseños+Únicos"
+                alt="Diseños Únicos"
+                class="w-full h-96 object-cover"
+              />
+            </div>
+            <!-- Diapositiva 3 -->
+            <div class="carousel-slide">
+              <img
+                src="https://placehold.co/1200x600/2ecc71/ffffff?text=Calidad+Artesanal"
+                alt="Calidad Artesanal"
+                class="w-full h-96 object-cover"
+              />
+            </div>
+            <!-- Diapositiva 4 -->
+            <div class="carousel-slide">
+              <img
+                src="https://placehold.co/1200x600/f39c12/ffffff?text=Hecho+en+México"
+                alt="Hecho en México"
+                class="w-full h-96 object-cover"
+              />
+            </div>
+          </div>
+
+          <!-- Indicadores de Puntos -->
+          <div
+            id="dots-container"
+            class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2"
+          >
+            <!-- Los puntos se generarán con JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Descripción -->
+    <section class="px-4 pt-8">
+      <div class="max-w-3xl mx-auto text-center mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Lily Cab 💎</h2>
+        <p class="text-gray-700">
+          La joyería NICE es fabricada a mano por artesanos mexicanos, con
+          materiales de calidad. La joyería es fabricada en metales como el
+          estaño, latón o bronce de acuerdo a la flexibilidad de cada pieza.
+        </p>
+      </div>
+    </section>
+
+    <!-- Enlaces sociales -->
+    <section class="px-4 mb-16">
+      <div class="max-w-3xl mx-auto flex justify-center space-x-8">
+        <a
+          href="https://wa.me/+529994451146"
+          target="_blank"
+          class="flex flex-col items-center text-gray-800 hover:text-blue-600 transition"
+        >
+          <!-- MODIFICACIÓN: Añadida la clase w-8 para igualar el tamaño -->
+          <img
+            src="./assets/images/whatsapp.svg"
+            alt="WhatsApp"
+            class="h-8 w-8"
+            onerror="this.onerror=null;this.parentElement.innerHTML += '<svg class=\'h-8 w-8\' fill=\'currentColor\' viewBox=\'0 0 24 24\' aria-hidden=\'true\'><path d=\'M12.04 2.018c-5.523 0-10 4.477-10 10s4.477 10 10 10c1.546 0 3.023-.35 4.357-1.005l2.643.88c.28.094.577-.11.664-.39l.9-2.92c.69-2.23.33-4.782-1.03-6.61C18.15 3.34 15.25 2.02 12.04 2.018zM9.51 8.525c.234-.482.492-.51.693-.52h.38c.22 0 .48.11.58.48l.68 2.3c.12.39.06.83-.17 1.12l-1.12 1.12c.74.92 1.63 1.79 2.55 2.53l1.12-1.12c.29-.29.73-.39 1.12-.17l2.3.68c.37.1.48.36.48.58v.38c0 .2-.04.45-.52.69s-1.81.6-3.26-.85c-2.17-2.17-2.7-4.46-1.02-6.14z\'/></svg>'; this.remove()"
+          />
+          <span class="mt-2 text-sm">WhatsApp</span>
+        </a>
+        <a
+          href="https://facebook.com/lily.cab.73"
+          target="_blank"
+          class="flex flex-col items-center text-gray-800 hover:text-blue-600 transition"
+        >
+          <!-- MODIFICACIÓN: Añadida la clase w-8 para igualar el tamaño -->
+          <img
+            src="./assets/images/facebook.svg"
+            alt="Facebook"
+            class="h-8 w-8"
+            onerror="this.onerror=null;this.parentElement.innerHTML += '<svg class=\'h-8 w-8\' fill=\'currentColor\' viewBox=\'0 0 24 24\' aria-hidden=\'true\'><path fill-rule=\'evenodd\' d=\'M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z\' clip-rule=\'evenodd\' /></svg>'; this.remove()"
+          />
+          <span class="mt-2 text-sm">Facebook</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 py-6 text-center">
+      <p class="text-sm text-gray-600">
+        &copy; 2025 NICE Joyería. Todos los derechos reservados.
+      </p>
+    </footer>
+
+    <!-- Script del Carrusel -->
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
