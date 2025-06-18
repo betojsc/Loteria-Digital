@@ -14,12 +14,11 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
   </head>
+
   <body class="bg-gray-100">
     <div class="container mx-auto p-4 md:p-8 flex flex-col h-screen">
       <!-- Encabezado fijo -->
-      <header
-        class="flex-none flex justify-center items-center gap-4 mb-4 md:mb-8"
-      >
+      <header class="flex-none flex justify-center items-center gap-4 mb-4">
         <h1 class="title">Lotería</h1>
         <img
           src="./assets/images/logo_nice.png"
@@ -29,80 +28,81 @@
       </header>
 
       <!-- Vistas de carga y placeholder -->
-      <div id="loading-view" class="flex-none text-center">
+      <div id="loading-view" class="flex-auto text-center py-10">
         <h2 class="text-2xl font-bold" style="color: var(--dark-blue)">
           Cargando partida...
         </h2>
       </div>
-      <div id="placeholder-view" class="flex-none text-center hidden">
+      <div id="placeholder-view" class="flex-auto text-center py-10 hidden">
         <h2 class="text-4xl font-bold text-gray-700">Próximamente</h2>
         <p class="text-xl text-gray-500 mt-2">
           Una nueva partida comenzará pronto. ¡Espérala!
         </p>
       </div>
 
-      <!-- Contenedor Principal: Cantor y Cartillas -->
+      <!-- Contenedor Principal -->
       <div
         id="game-container"
-        class="hidden flex-1 flex flex-col md:flex-row overflow-hidden"
+        class="hidden flex-1 flex flex-col md:grid md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
-        <!-- Módulo de El Cantor: ancho completo en móvil con mayor transparencia al hacer scroll, contenido centrado -->
+        <!-- Módulo de El Cantor -->
         <section
           id="cantor-section"
-          class="sticky top-0 z-20 w-full md:w-auto flex justify-center md:self-start flex-none p-2 bg-white/60 backdrop-blur-sm shadow-md md:flex-col"
+          class="sticky top-0 z-20 p-2 bg-white/60 backdrop-blur-sm shadow-md md:col-span-1 md:bg-white/80 md:p-4 md:rounded-xl md:shadow-lg md:sticky md:top-8 md:self-start"
         >
           <div
-            class="flex items-center justify-between md:flex-col md:bg-white md:p-6 md:rounded-xl md:shadow-lg w-auto"
+            class="flex items-center justify-between md:flex-col md:justify-start md:gap-4"
           >
-            <!-- Imagen o carta actual -->
+            <!-- Imagen o carta actual: AUMENTAMOS LA ALTURA EN DESKTOP -->
             <div
               id="current-card-container"
-              class="w-22 h-28 md:w-auto md:max-w-[200px] md:min-h-[280px] bg-gray-200 rounded-lg flex items-center justify-center p-1 md:p-2 md:mb-4"
+              class="w-24 h-36 md:w-full md:h-[25rem] bg-gray-200 rounded-lg flex items-center justify-center p-1"
             >
-              <span class="text-xs md:text-base text-gray-500 text-center"
+              <span class="text-xs text-gray-500 text-center"
                 >Esperando...</span
               >
             </div>
-            <!-- Conteo de cartas restantes -->
-            <div class="flex flex-col items-center mx-4">
-              <!-- Título móvil arriba del conteo con id para JS -->
+            <!-- Contenido del cantor -->
+            <div class="flex-1 md:flex-none text-center md:w-full">
               <h2
                 id="card-title"
-                class="block text-lg font-bold mb-1"
+                class="text-lg font-bold mb-1 mt-2"
                 style="color: var(--dark-blue)"
               >
                 El Cantor
               </h2>
-              <p class="text-sm text-gray-600">
-                Cartas restantes: <span id="deck-count">0</span>
+              <p class="text-sm text-gray-600 mb-4">
+                Restantes: <span id="deck-count">0</span>
               </p>
+              <button
+                id="call-card-btn"
+                class="hidden w-full text-white px-4 py-2 rounded-lg font-bold hover:opacity-90 transition-colors"
+                style="background-color: var(--dark-blue)"
+              >
+                Sacar carta
+              </button>
             </div>
-            <!-- Botón visible solo en modo admin (se muestra vía JS) -->
-            <button
-              id="call-card-btn"
-              class="hidden w-full text-white px-4 py-2 md:py-3 rounded-lg font-bold hover:opacity-90 transition-colors"
-              style="background-color: var(--dark-blue)"
-            >
-              Sacar carta
-            </button>
           </div>
         </section>
 
-        <!-- Sección de Cartillas, solo esta área es scrollable -->
-        <main id="main-content" class="flex-1 overflow-y-auto p-4">
+        <!-- Sección de Cartillas (Scrollable) -->
+        <main
+          id="main-content"
+          class="flex-1 overflow-y-auto p-4 md:col-span-2 lg:col-span-3"
+        >
           <div id="boards-overview">
             <h2
-              class="text-3xl font-bold text-center mb-6"
+              class="text-2xl md:text-3xl font-bold text-center mb-2"
               style="color: var(--dark-blue)"
             >
               Cartillas en Juego
             </h2>
-            <p class="text-center text-gray-600 mb-6 -mt-4">
+            <p class="text-center text-gray-600 mb-6">
               Toca una cartilla para enfocarla
             </p>
             <div
               id="boards-container"
-              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             ></div>
           </div>
 
@@ -122,7 +122,7 @@
       <!-- Modal Ganador -->
       <div
         id="winner-modal"
-        class="hidden fixed inset-0 flex items-center justify-center p-4 modal-background"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-background"
       >
         <div
           class="bg-white max-w-lg w-full rounded-xl shadow-2xl p-8 text-center"

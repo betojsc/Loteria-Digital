@@ -320,7 +320,38 @@ const uiAdmin = {
   },
 
   async handleChangePassword() {
-    // ... (resto de la lógica sin cambios)
+    const newPass = this.newPasswordInput.value;
+    const confirmPass = this.confirmPasswordInput.value;
+    this.passwordChangeStatus.textContent = "";
+    if (!newPass || newPass !== confirmPass) {
+      this.passwordChangeStatus.textContent = "Las contraseñas no coinciden.";
+      this.passwordChangeStatus.classList.add("text-red-500");
+      return;
+    }
+    this.confirmPasswordChangeBtn.disabled = true;
+    this.confirmPasswordChangeBtn.textContent = "Guardando...";
+    try {
+      const newHash = await hashPassword(newPass);
+      const securityRef = doc(db, "app_config", "security");
+      await setDoc(securityRef, { admin_password_hash: newHash });
+      this.passwordChangeStatus.textContent = "Contraseña actualizada.";
+      this.passwordChangeStatus.classList.remove("text-red-500");
+      this.passwordChangeStatus.classList.add("text-green-500");
+      setTimeout(() => {
+        this.passwordModal.classList.add("hidden");
+        this.passwordChangeStatus.textContent = "";
+        this.newPasswordInput.value = "";
+        this.confirmPasswordInput.value = "";
+        this.handleLogout();
+      }, 2000);
+    } catch (error) {
+      console.error("Password change error:", error);
+      this.passwordChangeStatus.textContent = "Error al guardar.";
+      this.passwordChangeStatus.classList.add("text-red-500");
+    } finally {
+      this.confirmPasswordChangeBtn.disabled = false;
+      this.confirmPasswordChangeBtn.textContent = "Guardar";
+    }
   },
 };
 uiAdmin.init();
