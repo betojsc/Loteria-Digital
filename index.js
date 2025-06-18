@@ -1,4 +1,62 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+// --- TU CONFIGURACIÓN DE FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDFn4Dntx2GbWTL9r6S0AlKDYCNfs8x22s",
+  authDomain: "loteria-digital.firebaseapp.com",
+  projectId: "loteria-digital",
+  storageBucket: "loteria-digital.appspot.com",
+  messagingSenderId: "274858696939",
+  appId: "1:274858696939:web:39925a407bd7aa54665eae",
+  measurementId: "G-790JYFXNQ2",
+};
+// ------------------------------------
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Función para configurar el enlace de juego dinámico
+async function setupPlayLink() {
+  const playLink = document.getElementById("play-link");
+  if (!playLink) return;
+
+  const defaultUrl = playLink.href; // Guarda la URL por defecto: "./juego.html"
+  let targetUrl = defaultUrl;
+
+  try {
+    const settingsRef = doc(db, "app_config", "settings");
+    const settingsSnap = await getDoc(settingsRef);
+
+    if (settingsSnap.exists() && settingsSnap.data().mainGameId) {
+      const mainGameId = settingsSnap.data().mainGameId;
+      // Si existe un juego principal, construye la URL completa
+      targetUrl = `./juego.html?id=${mainGameId}`;
+    }
+    // Si no existe, targetUrl permanece como la URL por defecto
+  } catch (error) {
+    console.error(
+      "Error al obtener la partida principal, se usará el enlace por defecto.",
+      error
+    );
+    targetUrl = defaultUrl;
+  } finally {
+    // Asigna la URL final al enlace y añade un listener para asegurar la navegación
+    playLink.href = targetUrl;
+    playLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      window.location.href = playLink.href; // Usa el href ya actualizado
+    });
+  }
+}
+
+// Lógica del Carrusel (sin cambios)
+function setupCarousel() {
+  // ... (todo el código del carrusel va aquí, no necesita cambios)
   const track = document.querySelector(".carousel-track");
   if (!track) return;
 
@@ -28,12 +86,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function autoPlay() {
+    if (slides.length === 0) return;
     let nextIndex = (currentIndex + 1) % slides.length;
     moveToSlide(nextIndex);
   }
 
   function startAutoPlay() {
-    stopAutoPlay(); // Evita múltiples intervalos
+    stopAutoPlay();
     intervalId = setInterval(autoPlay, 3000);
   }
 
@@ -41,7 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
     clearInterval(intervalId);
   }
 
-  // Crear puntos de navegación
   if (dotsContainer) {
     slides.forEach((_, index) => {
       const dot = document.createElement("button");
@@ -61,15 +119,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Reajustar en cambio de tamaño de ventana
   window.addEventListener("resize", () => {
     track.style.transition = "none";
     moveToSlide(currentIndex);
-    track.offsetHeight; // Forzar un reflow
+    track.offsetHeight;
     track.style.transition = "transform 0.8s ease-in-out";
   });
 
-  // Pausar al pasar el mouse sobre el carrusel
   if (carousel) {
     carousel.addEventListener("mouseenter", stopAutoPlay);
     carousel.addEventListener("mouseleave", startAutoPlay);
@@ -77,9 +133,14 @@ document.addEventListener("DOMContentLoaded", function () {
     carousel.addEventListener("focusout", startAutoPlay);
   }
 
-  // Iniciar
   if (slides.length > 0) {
     moveToSlide(0);
     startAutoPlay();
   }
+}
+
+// Ejecutar todo cuando la página cargue
+document.addEventListener("DOMContentLoaded", function () {
+  setupPlayLink();
+  setupCarousel();
 });

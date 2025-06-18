@@ -28,10 +28,13 @@
           class="h-12"
           onerror="this.onerror=null;this.src='https://placehold.co/150x50/eeeeee/333333?text=NICE+Logo';"
         />
-        <!-- Navegación -->
-        <nav class="space-x-6 hidden">
-          <a href="./juego.html" class="text-sm text-gray-800 hover:underline"
-            >Jugar</a
+        <!-- Navegación: Se quita la clase 'hidden' y se añade ID al enlace -->
+        <nav class="space-x-6">
+          <a
+            id="play-link"
+            href="./juego.html"
+            class="text-sm text-gray-800 hover:underline font-bold bg-amber-400 px-4 py-2 rounded-md hover:bg-amber-500 transition-colors"
+            >Jugar a la Lotería</a
           >
         </nav>
       </div>
@@ -49,7 +52,6 @@
           <div class="carousel-track">
             <!-- Diapositiva 1 -->
             <div class="carousel-slide">
-              <!-- MODIFICACIÓN: Cambiado h-auto a h-96 para una altura fija y responsiva -->
               <img
                 src="./assets/images/carrucel/image_01.jpeg"
                 alt="Diseños Únicos"
@@ -129,7 +131,6 @@
           target="_blank"
           class="flex flex-col items-center text-gray-800 hover:text-blue-600 transition"
         >
-          <!-- MODIFICACIÓN: Añadida la clase w-8 para igualar el tamaño -->
           <img
             src="./assets/images/whatsapp.svg"
             alt="WhatsApp"
@@ -143,7 +144,6 @@
           target="_blank"
           class="flex flex-col items-center text-gray-800 hover:text-blue-600 transition"
         >
-          <!-- MODIFICACIÓN: Añadida la clase w-8 para igualar el tamaño -->
           <img
             src="./assets/images/facebook.svg"
             alt="Facebook"

@@ -40,23 +40,23 @@
         </p>
       </div>
 
-      <!-- Contenedor Principal -->
+      <!-- Contenedor Principal: CORRECCIÓN, se quita overflow-hidden -->
       <div
         id="game-container"
         class="hidden flex-1 flex flex-col md:grid md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
-        <!-- Módulo de El Cantor -->
+        <!-- Módulo de El Cantor: CORRECCIÓN, se añade overflow-y-auto -->
         <section
           id="cantor-section"
-          class="sticky top-0 z-20 p-2 bg-white/60 backdrop-blur-sm shadow-md md:col-span-1 md:bg-white/80 md:p-4 md:rounded-xl md:shadow-lg md:sticky md:top-8 md:self-start"
+          class="sticky top-0 z-20 p-2 bg-white/60 backdrop-blur-sm shadow-md md:col-span-1 md:bg-white/80 md:p-4 md:rounded-xl md:shadow-lg md:sticky md:top-8 md:self-start overflow-y-auto"
         >
           <div
             class="flex items-center justify-between md:flex-col md:justify-start md:gap-4"
           >
-            <!-- Imagen o carta actual: AUMENTAMOS LA ALTURA EN DESKTOP -->
+            <!-- Contenedor de la carta con aspect-ratio -->
             <div
               id="current-card-container"
-              class="w-24 h-36 md:w-full md:h-[25rem] bg-gray-200 rounded-lg flex items-center justify-center p-1"
+              class="w-24 md:w-full rounded-lg flex items-center justify-center p-1 md:aspect-[2/3]"
             >
               <span class="text-xs text-gray-500 text-center"
                 >Esperando...</span
