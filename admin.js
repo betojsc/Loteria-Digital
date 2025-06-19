@@ -274,9 +274,13 @@ const uiAdmin = {
     }
     games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
     let html = "";
-    const baseUrl =
-      window.location.origin +
-      window.location.pathname.replace("admin.html", "");
+    // --- CORRECCIÓN ---
+    // Se usa un método más robusto para obtener la ruta base que funciona en local y en GitHub Pages.
+    const path = window.location.pathname;
+    const basePath = path.substring(0, path.lastIndexOf("/") + 1);
+    const baseUrl = window.location.origin + basePath;
+    // --- FIN DE LA CORRECCIÓN ---
+
     games.forEach((game) => {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
       const adminUrl = `${baseUrl}juego.html?id=${game.id}&token=${game.config.adminToken}`;
@@ -370,9 +374,13 @@ const uiAdmin = {
     }
     games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
     let html = "";
-    const baseUrl =
-      window.location.origin +
-      window.location.pathname.replace("admin.html", "");
+    // --- CORRECCIÓN ---
+    // Se usa un método más robusto para obtener la ruta base que funciona en local y en GitHub Pages.
+    const path = window.location.pathname;
+    const basePath = path.substring(0, path.lastIndexOf("/") + 1);
+    const baseUrl = window.location.origin + basePath;
+    // --- FIN DE LA CORRECCIÓN ---
+
     games.forEach((game) => {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
       const gameUrl = `${baseUrl}juego.html?id=${game.id}`;
