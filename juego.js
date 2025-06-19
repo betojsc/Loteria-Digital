@@ -27,6 +27,7 @@ let focusedPlayerIndex = null;
 const uiGame = {
   loadingView: document.getElementById("loading-view"),
   placeholderView: document.getElementById("placeholder-view"),
+  mainContent: document.getElementById("main-content"),
   gameContainer: document.getElementById("game-container"),
   boardsOverview: document.getElementById("boards-overview"),
   boardsContainer: document.getElementById("boards-container"),
@@ -185,6 +186,8 @@ const uiGame = {
     this.loadingView.classList.add("hidden");
     this.placeholderView.classList.remove("hidden");
     this.gameContainer.classList.add("hidden");
+    this.mainContent.classList.add("hidden");
+    this.cantorSection.classList.add("hidden");
   },
 
   initAdminControls(gameId) {
