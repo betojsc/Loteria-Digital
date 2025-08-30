@@ -8,10 +8,9 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
-  deleteField, // Importante: Se necesita para borrar un campo
+  deleteField,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// --- TU CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyDFn4Dntx2GbWTL9r6S0AlKDYCNfs8x22s",
   authDomain: "loteria-digital.firebaseapp.com",
@@ -21,7 +20,6 @@ const firebaseConfig = {
   appId: "1:274858696939:web:39925a407bd7aa54665eae",
   measurementId: "G-790JYFXNQ2",
 };
-// ------------------------------------
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -35,7 +33,6 @@ async function hashPassword(password) {
 }
 
 const uiAdmin = {
-  // ... (propiedades de UI sin cambios)
   loginSection: document.getElementById("login-section"),
   configSection: document.getElementById("config-section"),
   passwordInput: document.getElementById("password"),
@@ -67,7 +64,6 @@ const uiAdmin = {
   },
 
   async checkSession() {
-    // ... (sin cambios)
     const sessionString = localStorage.getItem("loteriaAdminSession");
     if (!sessionString) return;
     const session = JSON.parse(sessionString);
@@ -96,7 +92,6 @@ const uiAdmin = {
   },
 
   async handleLogin() {
-    // ... (sin cambios)
     const inputPassword = this.passwordInput.value;
     if (!inputPassword) return;
     this.loginBtn.disabled = true;
@@ -138,7 +133,6 @@ const uiAdmin = {
   },
 
   handleLogout() {
-    // ... (sin cambios)
     localStorage.removeItem("loteriaAdminSession");
     window.location.reload();
   },
@@ -154,35 +148,10 @@ const uiAdmin = {
       this.handleChangePassword()
     );
     this.logoutBtn.addEventListener("click", () => this.handleLogout());
-
-    // El listener se añade dinámicamente en displayActiveGames
     this.loadGames();
   },
 
-  async handleMainGameChange(event) {
-    const clickedCheckbox = event.target;
-    const gameId = clickedCheckbox.value;
-
-    // Desmarca todos los demás checkboxes
-    this.activeGamesList
-      .querySelectorAll(".main-game-checkbox")
-      .forEach((checkbox) => {
-        if (checkbox !== clickedCheckbox) {
-          checkbox.checked = false;
-        }
-      });
-
-    if (clickedCheckbox.checked) {
-      // Si el usuario marcó esta casilla, se establece como juego principal
-      await this.setMainGame(gameId);
-    } else {
-      // Si el usuario desmarcó la casilla, se elimina la configuración del juego principal
-      await this.clearMainGame();
-    }
-  },
-
   async loadGames() {
-    // ... (sin cambios, la versión robusta anterior es correcta)
     this.activeGamesList.innerHTML =
       '<p class="text-center text-gray-500">Cargando...</p>';
     this.winnersList.innerHTML =
@@ -198,65 +167,32 @@ const uiAdmin = {
 
       const allGames = [];
       gamesSnapshot.forEach((doc) => {
-        try {
-          const data = doc.data();
-          if (
-            data &&
-            data.createdAt &&
-            typeof data.createdAt.toDate === "function"
-          ) {
-            allGames.push({ id: doc.id, ...data });
-          } else {
-            console.warn(
-              `Skipping game document ${doc.id} due to missing or invalid createdAt field.`
-            );
-          }
-        } catch (e) {
-          console.error(`Failed to process game document ${doc.id}:`, e);
+        const data = doc.data();
+        if (data && data.createdAt) {
+          allGames.push({ id: doc.id, ...data });
         }
       });
 
       const allDrafts = [];
       draftsSnapshot.forEach((doc) => {
-        try {
-          const data = doc.data();
-          if (
-            data &&
-            data.createdAt &&
-            typeof data.createdAt.toDate === "function"
-          ) {
-            allDrafts.push({ id: doc.id, ...data });
-          } else {
-            console.warn(
-              `Skipping draft document ${doc.id} due to missing or invalid createdAt field.`
-            );
-          }
-        } catch (e) {
-          console.error(`Failed to process draft document ${doc.id}:`, e);
+        const data = doc.data();
+        if (data && data.createdAt) {
+          allDrafts.push({ id: doc.id, ...data });
         }
       });
 
-      const activeGames = allGames.filter((game) => !game.winner);
-      const winners = allGames.filter((game) => game.winner);
+      const activeGames = allGames.filter(
+        (game) => !game.winners || game.winners.length === 0
+      );
+      const finishedGames = allGames.filter(
+        (game) => game.winners && game.winners.length > 0
+      );
 
-      this.displayActiveGames(activeGames, null);
-      this.displayWinners(winners);
+      this.displayActiveGames(activeGames);
+      this.displayWinners(finishedGames);
       this.displayDraftGames(allDrafts);
-
-      const settingsDoc = await getDoc(doc(db, "app_config", "settings"));
-      if (settingsDoc.exists()) {
-        const mainGameId = settingsDoc.data().mainGameId;
-        if (mainGameId) {
-          const checkboxToCheck = this.activeGamesList.querySelector(
-            `input[value="${mainGameId}"]`
-          );
-          if (checkboxToCheck) {
-            checkboxToCheck.checked = true;
-          }
-        }
-      }
     } catch (error) {
-      console.error("Major error fetching collections:", error);
+      console.error("Error fetching collections:", error);
       this.activeGamesList.innerHTML =
         '<p class="text-center text-red-500">Error al consultar partidas.</p>';
       this.winnersList.innerHTML =
@@ -274,12 +210,9 @@ const uiAdmin = {
     }
     games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
     let html = "";
-    // --- CORRECCIÓN ---
-    // Se usa un método más robusto para obtener la ruta base que funciona en local y en GitHub Pages.
     const path = window.location.pathname;
     const basePath = path.substring(0, path.lastIndexOf("/") + 1);
     const baseUrl = window.location.origin + basePath;
-    // --- FIN DE LA CORRECCIÓN ---
 
     games.forEach((game) => {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
@@ -299,22 +232,9 @@ const uiAdmin = {
                         </button>
                     </div>
                 </div>
-                <div class="pt-3 border-t border-blue-200">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" class="main-game-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 rounded" value="${game.id}">
-                        <span class="text-sm font-medium text-blue-700">Marcar como juego principal</span>
-                    </label>
-                </div>
             </div>`;
     });
     this.activeGamesList.innerHTML = html;
-
-    // Añade listeners a los nuevos checkboxes
-    this.activeGamesList
-      .querySelectorAll(".main-game-checkbox")
-      .forEach((checkbox) => {
-        checkbox.addEventListener("click", (e) => this.handleMainGameChange(e));
-      });
 
     this.activeGamesList
       .querySelectorAll(".copy-active-link-btn")
@@ -328,45 +248,7 @@ const uiAdmin = {
       });
   },
 
-  async setMainGame(gameId) {
-    const settingsRef = doc(db, "app_config", "settings");
-    try {
-      await setDoc(settingsRef, { mainGameId: gameId }, { merge: true });
-      this.showFeedback("Juego principal establecido.");
-    } catch (error) {
-      console.error("Error setting main game:", error);
-      alert("No se pudo guardar la selección.");
-    }
-  },
-
-  async clearMainGame() {
-    const settingsRef = doc(db, "app_config", "settings");
-    try {
-      await updateDoc(settingsRef, {
-        mainGameId: deleteField(),
-      });
-      this.showFeedback("Se ha quitado el juego principal.");
-    } catch (error) {
-      console.error("Error clearing main game:", error);
-      alert("No se pudo quitar la selección.");
-    }
-  },
-
-  showFeedback(message) {
-    const feedback = document.createElement("div");
-    feedback.textContent = message;
-    feedback.className =
-      "fixed bottom-4 right-4 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg animate-pulse";
-    document.body.appendChild(feedback);
-    setTimeout(() => {
-      if (document.body.contains(feedback)) {
-        document.body.removeChild(feedback);
-      }
-    }, 3000);
-  },
-
   displayWinners(games) {
-    // ... (sin cambios)
     if (games.length === 0) {
       this.winnersList.innerHTML =
         '<p class="text-center text-gray-500">No hay ganadores registrados.</p>';
@@ -374,23 +256,35 @@ const uiAdmin = {
     }
     games.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
     let html = "";
-    // --- CORRECCIÓN ---
-    // Se usa un método más robusto para obtener la ruta base que funciona en local y en GitHub Pages.
     const path = window.location.pathname;
     const basePath = path.substring(0, path.lastIndexOf("/") + 1);
     const baseUrl = window.location.origin + basePath;
-    // --- FIN DE LA CORRECCIÓN ---
 
     games.forEach((game) => {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
       const gameUrl = `${baseUrl}juego.html?id=${game.id}`;
+
+      // --- LÓGICA DE VISUALIZACIÓN DE GANADORES ACTUALIZADA ---
+      let winnerText = '<div class="space-y-1">';
+      game.winners.forEach((winner) => {
+        const placeText =
+          {
+            1: "1er:",
+            2: "2do:",
+            3: "3er:",
+          }[winner.place] || `${winner.place}to:`;
+
+        winnerText += `<p class="text-sm"><span class="font-semibold text-gray-600">${placeText}</span> <span class="text-emerald-700">${winner.name}</span></p>`;
+      });
+      winnerText += "</div>";
+
       html += `
-        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-start">
             <div>
-                <p class="font-bold text-emerald-600">${game.winner.name}</p>
-                <p class="text-xs text-gray-500">Fecha: ${date}</p>
+                ${winnerText}
+                <p class="text-xs text-gray-500 mt-2">Fecha: ${date}</p>
             </div>
-            <a href="${gameUrl}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold">Ver Partida</a>
+            <a href="${gameUrl}" target="_blank" class="text-sky-600 hover:underline text-sm font-semibold self-center">Ver Partida</a>
         </div>
       `;
     });
@@ -398,7 +292,6 @@ const uiAdmin = {
   },
 
   displayDraftGames(drafts) {
-    // ... (sin cambios)
     if (drafts.length === 0) {
       this.draftGamesList.innerHTML =
         '<p class="text-center text-gray-500">No hay borradores.</p>';
@@ -422,7 +315,6 @@ const uiAdmin = {
   },
 
   copyToClipboard(text, buttonElement) {
-    // ... (sin cambios)
     if (!text || !buttonElement) return;
     navigator.clipboard
       .writeText(text)
@@ -440,7 +332,6 @@ const uiAdmin = {
   },
 
   async handleChangePassword() {
-    // ... (sin cambios)
     const newPass = this.newPasswordInput.value;
     const confirmPass = this.confirmPasswordInput.value;
     this.passwordChangeStatus.textContent = "";
