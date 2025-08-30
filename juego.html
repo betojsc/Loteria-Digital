@@ -17,7 +17,6 @@
 
   <body class="bg-gray-100">
     <div class="container mx-auto p-4 md:p-8 flex flex-col h-screen">
-      <!-- Encabezado fijo -->
       <header class="flex-none flex justify-center items-center gap-4 mb-4">
         <h1 class="title">Lotería</h1>
         <img
@@ -27,7 +26,6 @@
         />
       </header>
 
-      <!-- Vistas de carga y placeholder -->
       <div id="loading-view" class="flex-auto text-center py-10">
         <h2 class="text-2xl font-bold" style="color: var(--dark-blue)">
           Cargando partida...
@@ -40,12 +38,10 @@
         </p>
       </div>
 
-      <!-- Contenedor Principal: CORRECCIÓN, se quita overflow-hidden -->
       <div
         id="game-container"
         class="hidden flex-1 flex flex-col md:grid md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
-        <!-- Módulo de El Cantor: CORRECCIÓN, se añade overflow-y-auto -->
         <section
           id="cantor-section"
           class="sticky top-0 z-20 p-2 bg-white/60 backdrop-blur-sm shadow-md md:col-span-1 md:bg-white/80 md:p-4 md:rounded-xl md:shadow-lg md:sticky md:top-8 md:self-start overflow-y-auto"
@@ -53,7 +49,6 @@
           <div
             class="flex items-center justify-between md:flex-col md:justify-start md:gap-4"
           >
-            <!-- Contenedor de la carta con aspect-ratio -->
             <div
               id="current-card-container"
               class="w-24 md:w-full rounded-lg flex items-center justify-center p-1 md:aspect-[2/3]"
@@ -62,7 +57,6 @@
                 >Esperando...</span
               >
             </div>
-            <!-- Contenido del cantor -->
             <div class="flex-1 md:flex-none text-center md:w-full">
               <h2
                 id="card-title"
@@ -85,7 +79,6 @@
           </div>
         </section>
 
-        <!-- Sección de Cartillas (Scrollable) -->
         <main
           id="main-content"
           class="flex-1 overflow-y-auto p-4 md:col-span-2 lg:col-span-3"
@@ -106,7 +99,6 @@
             ></div>
           </div>
 
-          <!-- Vista Móvil Enfocada -->
           <div id="mobile-focus-view" class="hidden">
             <button
               id="show-all-boards-btn"
@@ -119,17 +111,14 @@
         </main>
       </div>
 
-      <!-- Modal Ganador -->
       <div
         id="winner-modal"
         class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-background"
       >
         <div
-          class="bg-white max-w-lg w-full rounded-xl shadow-2xl p-8 text-center"
+          class="bg-white max-w-4xl w-full rounded-xl shadow-2xl p-6 md:p-8 text-center"
         >
-          <header
-            class="flex-none flex justify-center items-center gap-4 mb-4 md:mb-8"
-          >
+          <header class="flex-none flex justify-center items-center gap-4 mb-4">
             <h1 class="title">Lotería</h1>
             <img
               src="./assets/images/logo_nice.png"
@@ -137,16 +126,16 @@
               class="h-12"
             />
           </header>
-          <p class="text-2xl mt-4">El ganador es:</p>
-          <p
-            id="winner-name"
-            class="text-4xl font-extrabold text-emerald-600 my-4"
-          ></p>
+          <h2 class="text-3xl font-bold text-emerald-600 my-4">
+            ¡Tenemos Ganadores!
+          </h2>
+
           <div
-            id="winning-board"
-            class="grid grid-cols-4 gap-2 max-w-xs mx-auto my-6 p-2 bg-amber-100 border-4 border-amber-500 rounded-lg"
+            id="winners-podium"
+            class="flex overflow-x-auto space-x-6 pb-4 md:grid md:grid-cols-3 md:gap-6 md:space-x-0 md:pb-0"
           ></div>
-          <p class="text-gray-600">¡Gracias por participar!</p>
+
+          <p class="text-gray-600 mt-8">¡Gracias por participar!</p>
         </div>
       </div>
     </div>

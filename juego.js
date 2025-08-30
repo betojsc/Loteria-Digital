@@ -6,7 +6,6 @@ import {
   updateDoc,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// --- PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyDFn4Dntx2GbWTL9r6S0AlKDYCNfs8x22s",
   authDomain: "loteria-digital.firebaseapp.com",
@@ -16,13 +15,13 @@ const firebaseConfig = {
   appId: "1:274858696939:web:39925a407bd7aa54665eae",
   measurementId: "G-790JYFXNQ2",
 };
-// -----------------------------------------
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let currentGameData = null;
 let focusedPlayerIndex = null;
+let isAdmin = false;
 
 const uiGame = {
   loadingView: document.getElementById("loading-view"),
@@ -39,8 +38,7 @@ const uiGame = {
   deckCountSpan: document.getElementById("deck-count"),
   callCardBtn: document.getElementById("call-card-btn"),
   winnerModal: document.getElementById("winner-modal"),
-  winnerName: document.getElementById("winner-name"),
-  winningBoard: document.getElementById("winning-board"),
+  winnersPodium: document.getElementById("winners-podium"),
   cantorSection: document.getElementById("cantor-section"),
 
   init() {
@@ -68,7 +66,14 @@ const uiGame = {
       this.currentCardContainer.innerHTML = `<span class="text-xs md:text-base text-gray-500 text-center">Esperando...</span>`;
     }
     this.deckCountSpan.textContent = gameData.deck.length;
-    this.callCardBtn.disabled = gameData.winner || gameData.deck.length === 0;
+
+    const maxWinners = gameData.config.winnerCount || 1;
+    const isGameOver =
+      gameData.winners.length >= maxWinners || gameData.deck.length === 0;
+
+    if (isAdmin) {
+      this.callCardBtn.disabled = isGameOver;
+    }
 
     if (focusedPlayerIndex !== null) {
       this.boardsOverview.classList.add("hidden");
@@ -80,12 +85,45 @@ const uiGame = {
       this.renderAllBoards(gameData);
     }
 
-    if (gameData.winner && !this.winnerModal.classList.contains("active")) {
-      this.showWinner(gameData);
-    } else if (!gameData.winner) {
-      this.winnerModal.classList.add("hidden");
-      this.winnerModal.classList.remove("active");
+    if (isGameOver && !this.winnerModal.classList.contains("active")) {
+      this.showWinnersPodium(gameData);
     }
+  },
+
+  getPlaceSuffix(place) {
+    const suffixes = ["er", "do", "er"];
+    return `${place}${suffixes[place - 1] || "to"}`;
+  },
+
+  createBoardElement(player, config, calledCards, winners) {
+    const boardEl = document.createElement("div");
+    const winnerInfo = winners.find((w) => w.name === player.name);
+
+    boardEl.className =
+      "bg-white p-4 rounded-xl shadow-lg border border-gray-200 mx-auto max-w-xs relative";
+    let cardsHtml = "";
+    player.board.cards.forEach((card) => {
+      const isMarked = calledCards.some((cc) => cc.id === card.id);
+      cardsHtml += `<div class="relative ${
+        isMarked ? "marked" : ""
+      }"><img src="assets/images/${card.img}" alt="${
+        card.name
+      }" class="card-image"></div>`;
+    });
+
+    let winnerBadge = "";
+    if (winnerInfo) {
+      const placeText = this.getPlaceSuffix(winnerInfo.place);
+      winnerBadge = `<div class="absolute -top-3 -right-3 bg-amber-400 text-white font-bold text-sm px-3 py-1 rounded-full shadow-lg transform rotate-12">${placeText} Lugar</div>`;
+    }
+
+    boardEl.innerHTML = `
+      ${winnerBadge}
+      <h3 class="text-xl font-bold text-center mb-4 text-amber-700">${player.name}</h3>
+      <div class="grid gap-2" style="grid-template-columns: repeat(${config.cols}, 1fr)">
+        ${cardsHtml}
+      </div>`;
+    return boardEl;
   },
 
   renderAllBoards(gameData) {
@@ -94,7 +132,8 @@ const uiGame = {
       const boardEl = this.createBoardElement(
         player,
         gameData.config,
-        gameData.calledCards
+        gameData.calledCards,
+        gameData.winners
       );
       boardEl.dataset.playerIndex = index;
       boardEl.classList.add("cursor-pointer");
@@ -107,30 +146,10 @@ const uiGame = {
     const boardEl = this.createBoardElement(
       player,
       gameData.config,
-      gameData.calledCards
+      gameData.calledCards,
+      gameData.winners
     );
     this.focusedBoardContainer.appendChild(boardEl);
-  },
-
-  createBoardElement(player, config, calledCards) {
-    const boardEl = document.createElement("div");
-    boardEl.className =
-      "bg-white p-4 rounded-xl shadow-lg border border-gray-200 mx-auto max-w-xs";
-    let cardsHtml = "";
-    player.board.cards.forEach((card) => {
-      const isMarked = calledCards.some((cc) => cc.id === card.id);
-      cardsHtml += `<div class="relative ${
-        isMarked ? "marked" : ""
-      }"><img src="assets/images/${card.img}" alt="${
-        card.name
-      }" class="card-image"></div>`;
-    });
-    boardEl.innerHTML = `
-      <h3 class="text-xl font-bold text-center mb-4 text-amber-700">${player.name}</h3>
-      <div class="grid gap-2" style="grid-template-columns: repeat(${config.cols}, 1fr)">
-        ${cardsHtml}
-      </div>`;
-    return boardEl;
   },
 
   focusOnBoard(index) {
@@ -143,13 +162,40 @@ const uiGame = {
     this.renderGame(currentGameData);
   },
 
-  showWinner(gameData) {
-    this.winnerName.textContent = gameData.winner.name;
-    this.winningBoard.innerHTML = "";
-    this.winningBoard.style.gridTemplateColumns = `repeat(${gameData.config.cols}, 1fr)`;
-    gameData.winner.board.cards.forEach((card) => {
-      this.winningBoard.innerHTML += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
+  showWinnersPodium(gameData) {
+    this.winnersPodium.innerHTML = "";
+
+    const medalColors = {
+      1: "#D4AF37", // Gold
+      2: "#A7A7AD", // Silver
+      3: "#A0522D", // Bronze
+    };
+
+    gameData.winners.forEach((winner) => {
+      const placeText = this.getPlaceSuffix(winner.place);
+      const placeColor = medalColors[winner.place] || "#6b7280";
+
+      const podiumEntry = document.createElement("div");
+      // --- CLASE ACTUALIZADA PARA SER RESPONSIVE ---
+      podiumEntry.className =
+        "flex flex-col items-center flex-shrink-0 w-[240px] md:w-auto";
+
+      let cardsHtml = "";
+      winner.board.cards.forEach((card) => {
+        cardsHtml += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
+      });
+
+      podiumEntry.innerHTML = `
+        <p class="text-xl font-bold" style="color: ${placeColor}">${placeText} Lugar</p>
+        <p class="text-2xl font-extrabold my-1" style="color: ${placeColor}">${winner.name}</p>
+        <div class="grid gap-1 w-full p-1 bg-amber-50 border-2 rounded-lg" 
+             style="grid-template-columns: repeat(${gameData.config.cols}, 1fr); border-color: ${placeColor}">
+          ${cardsHtml}
+        </div>
+      `;
+      this.winnersPodium.appendChild(podiumEntry);
     });
+
     this.winnerModal.classList.remove("hidden");
     this.winnerModal.classList.add("active");
     this.cantorSection.classList.add("hidden");
@@ -186,32 +232,43 @@ const uiGame = {
     this.loadingView.classList.add("hidden");
     this.placeholderView.classList.remove("hidden");
     this.gameContainer.classList.add("hidden");
-    this.mainContent.classList.add("hidden");
-    this.cantorSection.classList.add("hidden");
   },
 
   initAdminControls(gameId) {
+    isAdmin = true;
     this.callCardBtn.classList.remove("hidden");
     this.callCardBtn.addEventListener("click", async () => {
-      if (
-        !currentGameData ||
-        currentGameData.deck.length === 0 ||
-        currentGameData.winner
-      )
-        return;
+      if (!currentGameData) return;
+
+      const maxWinners = currentGameData.config.winnerCount || 1;
+      const isGameOver =
+        currentGameData.winners.length >= maxWinners ||
+        currentGameData.deck.length === 0;
+      if (isGameOver) return;
+
+      this.callCardBtn.disabled = true;
 
       const updatedDeck = [...currentGameData.deck];
       const nextCard = updatedDeck.pop();
       const updatedCalledCards = [...currentGameData.calledCards, nextCard];
 
-      let winner = null;
+      let updatedWinners = [...currentGameData.winners];
+
       for (const player of currentGameData.players) {
+        const isAlreadyWinner = updatedWinners.some(
+          (w) => w.name === player.name
+        );
+        if (isAlreadyWinner) continue;
+
         const markedCount = player.board.cards.filter((c) =>
           updatedCalledCards.some((cc) => cc.id === c.id)
         ).length;
+
         if (markedCount === player.board.cards.length) {
-          winner = player;
-          break;
+          updatedWinners.push({
+            ...player,
+            place: updatedWinners.length + 1,
+          });
         }
       }
 
@@ -219,7 +276,7 @@ const uiGame = {
       await updateDoc(gameRef, {
         deck: updatedDeck,
         calledCards: updatedCalledCards,
-        winner: winner,
+        winners: updatedWinners,
       });
     });
   },
@@ -235,6 +292,7 @@ function main() {
     return;
   }
 
+  uiGame.init();
   const gameRef = doc(db, "games", gameId);
 
   onSnapshot(
@@ -245,12 +303,12 @@ function main() {
         if (
           token &&
           currentGameData.config &&
-          token === currentGameData.config.adminToken
+          token === currentGameData.config.adminToken &&
+          !isAdmin
         ) {
           uiGame.initAdminControls(gameId);
         }
         uiGame.renderGame(currentGameData);
-        uiGame.init();
       } else {
         uiGame.showPlaceholder();
       }
@@ -262,5 +320,4 @@ function main() {
   );
 }
 
-uiGame.init();
 main();

@@ -5,7 +5,6 @@ import {
   setDoc,
   getDoc,
   collection,
-  updateDoc,
   deleteDoc,
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
@@ -112,6 +111,7 @@ const customGameUI = {
   rowsInput: document.getElementById("rows"),
   colsInput: document.getElementById("cols"),
   boardCountInput: document.getElementById("board-count"),
+  winnerCountInput: document.getElementById("winner-count"),
   generateBoardsBtn: document.getElementById("generate-boards-btn"),
   assignNamesSection: document.getElementById("assign-names-section"),
   boardsContainer: document.getElementById("generated-boards-container"),
@@ -173,8 +173,9 @@ const customGameUI = {
     const rows = parseInt(this.rowsInput.value, 10);
     const cols = parseInt(this.colsInput.value, 10);
     const boardCount = parseInt(this.boardCountInput.value, 10);
+    const winnerCount = parseInt(this.winnerCountInput.value, 10);
 
-    if (isNaN(rows) || isNaN(cols) || isNaN(boardCount)) {
+    if (isNaN(rows) || isNaN(cols) || isNaN(boardCount) || isNaN(winnerCount)) {
       alert("Por favor, introduce valores numéricos válidos.");
       return;
     }
@@ -197,7 +198,7 @@ const customGameUI = {
         ...board,
         id: this.nextBoardId++,
       })),
-      config: { rows, cols },
+      config: { rows, cols, winnerCount },
     };
 
     this.initialSetup.classList.add("hidden");
@@ -267,7 +268,9 @@ const customGameUI = {
     if (!this.draftId) {
       this.draftId = doc(collection(db, "draft_games")).id;
       this.draftData.createdAt = new Date();
-      this.draftData.config.adminToken = crypto.randomUUID();
+      if (!this.draftData.config.adminToken) {
+        this.draftData.config.adminToken = crypto.randomUUID();
+      }
     }
 
     try {
@@ -298,14 +301,19 @@ const customGameUI = {
         board: { cards: board.cards, marked: [] },
       }));
 
-    if (players.length < 2) {
+    // --- NUEVA VALIDACIÓN ---
+    const winnerCount = this.draftData.config.winnerCount || 1;
+    const minPlayers = winnerCount + 1;
+
+    if (players.length < minPlayers) {
       alert(
-        "Se necesitan al menos 2 jugadores con nombre para iniciar la partida."
+        `Para ${winnerCount} ganador(es), se necesitan al menos ${minPlayers} jugadores con nombre para iniciar la partida.`
       );
       this.startGameBtn.disabled = false;
       this.startGameBtn.textContent = "Iniciar Juego";
       return;
     }
+    // --- FIN DE LA VALIDACIÓN ---
 
     const gameId = doc(collection(db, "games")).id;
     const gameData = {
@@ -313,7 +321,7 @@ const customGameUI = {
       players,
       deck: gameLogic.shuffleDeck(),
       calledCards: [],
-      winner: null,
+      winners: [],
       createdAt: new Date(),
     };
 

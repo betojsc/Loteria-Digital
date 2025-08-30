@@ -29,7 +29,7 @@
         <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">
           Paso 1: Configurar Partida
         </h2>
-        <div class="grid md:grid-cols-2 gap-8">
+        <div class="grid md:grid-cols-3 gap-8">
           <div>
             <h3 class="font-semibold">Tamaño de Cartilla</h3>
             <div class="flex items-center space-x-4 mt-2">
@@ -58,7 +58,7 @@
             </div>
           </div>
           <div>
-            <h3 class="font-semibold">Cantidad de Cartillas a Generar</h3>
+            <h3 class="font-semibold">Cantidad de Cartillas</h3>
             <label for="board-count" class="sr-only">Cantidad</label>
             <input
               type="number"
@@ -66,6 +66,18 @@
               value="10"
               min="2"
               max="50"
+              class="mt-2 w-full p-2 border rounded-lg"
+            />
+          </div>
+          <div>
+            <h3 class="font-semibold">Número de Ganadores</h3>
+            <label for="winner-count" class="sr-only">Ganadores</label>
+            <input
+              type="number"
+              id="winner-count"
+              value="1"
+              min="1"
+              max="3"
               class="mt-2 w-full p-2 border rounded-lg"
             />
           </div>
@@ -111,7 +123,7 @@
             />
             <button
               id="add-boards-btn"
-              class="bg-[var(--dark-blue)] text-white px-6 py-2 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors mt-4"
+              class="bg-[var(--dark-blue)] text-white px-6 py-2 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors"
             >
               Añadir
             </button>
