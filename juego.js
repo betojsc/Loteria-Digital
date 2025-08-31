@@ -53,8 +53,18 @@ const uiGame = {
 
   renderGame(gameData) {
     this.loadingView.classList.add("hidden");
-    this.placeholderView.classList.add("hidden");
     this.gameContainer.classList.remove("hidden");
+    this.cantorSection.classList.remove("hidden");
+    this.boardsOverview.classList.remove("hidden");
+    this.placeholderView.classList.add("hidden");
+
+    // --- CAMBIO: Se eliminan las clases de centrado cuando se muestra el juego ---
+    this.mainContent.classList.remove(
+      "flex",
+      "flex-col",
+      "justify-center",
+      "items-center"
+    );
 
     const calledCards = gameData.calledCards || [];
     const currentCard =
@@ -164,38 +174,26 @@ const uiGame = {
 
   showWinnersPodium(gameData) {
     this.winnersPodium.innerHTML = "";
-
-    const medalColors = {
-      1: "#D4AF37", // Gold
-      2: "#A7A7AD", // Silver
-      3: "#A0522D", // Bronze
-    };
-
+    const medalColors = { 1: "#D4AF37", 2: "#A7A7AD", 3: "#A0522D" };
     gameData.winners.forEach((winner) => {
       const placeText = this.getPlaceSuffix(winner.place);
       const placeColor = medalColors[winner.place] || "#6b7280";
-
       const podiumEntry = document.createElement("div");
-      // --- CLASE ACTUALIZADA PARA SER RESPONSIVE ---
       podiumEntry.className =
         "flex flex-col items-center flex-shrink-0 w-[240px] md:w-auto";
-
       let cardsHtml = "";
       winner.board.cards.forEach((card) => {
         cardsHtml += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
       });
-
       podiumEntry.innerHTML = `
         <p class="text-xl font-bold" style="color: ${placeColor}">${placeText} Lugar</p>
         <p class="text-2xl font-extrabold my-1" style="color: ${placeColor}">${winner.name}</p>
         <div class="grid gap-1 w-full p-1 bg-amber-50 border-2 rounded-lg" 
              style="grid-template-columns: repeat(${gameData.config.cols}, 1fr); border-color: ${placeColor}">
           ${cardsHtml}
-        </div>
-      `;
+        </div>`;
       this.winnersPodium.appendChild(podiumEntry);
     });
-
     this.winnerModal.classList.remove("hidden");
     this.winnerModal.classList.add("active");
     this.cantorSection.classList.add("hidden");
@@ -206,11 +204,9 @@ const uiGame = {
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
-
     function randomInRange(min, max) {
       return Math.random() * (max - min) + min;
     }
-
     const interval = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
       if (timeLeft <= 0) return clearInterval(interval);
@@ -230,48 +226,48 @@ const uiGame = {
 
   showPlaceholder() {
     this.loadingView.classList.add("hidden");
+    this.gameContainer.classList.remove("hidden");
     this.placeholderView.classList.remove("hidden");
-    this.gameContainer.classList.add("hidden");
+    this.cantorSection.classList.add("hidden");
+    this.boardsOverview.classList.add("hidden");
+
+    // --- CAMBIO: Se añaden clases para centrar el contenido ---
+    this.mainContent.classList.add(
+      "flex",
+      "flex-col",
+      "justify-center",
+      "items-center"
+    );
   },
 
   initAdminControls(gameId) {
     isAdmin = true;
+    this.cantorSection.classList.remove("hidden");
     this.callCardBtn.classList.remove("hidden");
     this.callCardBtn.addEventListener("click", async () => {
       if (!currentGameData) return;
-
       const maxWinners = currentGameData.config.winnerCount || 1;
       const isGameOver =
         currentGameData.winners.length >= maxWinners ||
         currentGameData.deck.length === 0;
       if (isGameOver) return;
-
       this.callCardBtn.disabled = true;
-
       const updatedDeck = [...currentGameData.deck];
       const nextCard = updatedDeck.pop();
       const updatedCalledCards = [...currentGameData.calledCards, nextCard];
-
       let updatedWinners = [...currentGameData.winners];
-
       for (const player of currentGameData.players) {
         const isAlreadyWinner = updatedWinners.some(
           (w) => w.name === player.name
         );
         if (isAlreadyWinner) continue;
-
         const markedCount = player.board.cards.filter((c) =>
           updatedCalledCards.some((cc) => cc.id === c.id)
         ).length;
-
         if (markedCount === player.board.cards.length) {
-          updatedWinners.push({
-            ...player,
-            place: updatedWinners.length + 1,
-          });
+          updatedWinners.push({ ...player, place: updatedWinners.length + 1 });
         }
       }
-
       const gameRef = doc(db, "games", gameId);
       await updateDoc(gameRef, {
         deck: updatedDeck,

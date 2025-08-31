@@ -151,6 +151,26 @@ const uiAdmin = {
     this.loadGames();
   },
 
+  // --- NUEVO: Traído de la versión anterior ---
+  async handleMainGameChange(event) {
+    const clickedCheckbox = event.target;
+    const gameId = clickedCheckbox.value;
+
+    this.activeGamesList
+      .querySelectorAll(".main-game-checkbox")
+      .forEach((checkbox) => {
+        if (checkbox !== clickedCheckbox) {
+          checkbox.checked = false;
+        }
+      });
+
+    if (clickedCheckbox.checked) {
+      await this.setMainGame(gameId);
+    } else {
+      await this.clearMainGame();
+    }
+  },
+
   async loadGames() {
     this.activeGamesList.innerHTML =
       '<p class="text-center text-gray-500">Cargando...</p>';
@@ -181,6 +201,7 @@ const uiAdmin = {
         }
       });
 
+      // Se mantiene la lógica de filtrado de la versión nueva (con winners array)
       const activeGames = allGames.filter(
         (game) => !game.winners || game.winners.length === 0
       );
@@ -191,6 +212,20 @@ const uiAdmin = {
       this.displayActiveGames(activeGames);
       this.displayWinners(finishedGames);
       this.displayDraftGames(allDrafts);
+
+      // --- MODIFICADO: Lógica para marcar el checkbox del juego principal ---
+      const settingsDoc = await getDoc(doc(db, "app_config", "settings"));
+      if (settingsDoc.exists()) {
+        const mainGameId = settingsDoc.data().mainGameId;
+        if (mainGameId) {
+          const checkboxToCheck = this.activeGamesList.querySelector(
+            `input[value="${mainGameId}"]`
+          );
+          if (checkboxToCheck) {
+            checkboxToCheck.checked = true;
+          }
+        }
+      }
     } catch (error) {
       console.error("Error fetching collections:", error);
       this.activeGamesList.innerHTML =
@@ -218,6 +253,7 @@ const uiAdmin = {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
       const adminUrl = `${baseUrl}juego.html?id=${game.id}&token=${game.config.adminToken}`;
       const playerUrl = `${baseUrl}juego.html?id=${game.id}`;
+      // --- MODIFICADO: Se añade el HTML del checkbox ---
       html += `
             <div class="bg-blue-50 p-4 rounded-lg space-y-3">
                 <div class="flex justify-between items-center">
@@ -232,9 +268,22 @@ const uiAdmin = {
                         </button>
                     </div>
                 </div>
+                <div class="pt-3 border-t border-blue-200">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="main-game-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 rounded" value="${game.id}">
+                        <span class="text-sm font-medium text-blue-700">Marcar como juego principal</span>
+                    </label>
+                </div>
             </div>`;
     });
     this.activeGamesList.innerHTML = html;
+
+    // --- MODIFICADO: Se añaden los listeners para los checkboxes ---
+    this.activeGamesList
+      .querySelectorAll(".main-game-checkbox")
+      .forEach((checkbox) => {
+        checkbox.addEventListener("click", (e) => this.handleMainGameChange(e));
+      });
 
     this.activeGamesList
       .querySelectorAll(".copy-active-link-btn")
@@ -248,7 +297,59 @@ const uiAdmin = {
       });
   },
 
+  // --- NUEVO: Traído de la versión anterior ---
+  async setMainGame(gameId) {
+    const settingsRef = doc(db, "app_config", "settings");
+    try {
+      await setDoc(settingsRef, { mainGameId: gameId }, { merge: true });
+      this.showFeedback("Juego principal establecido.");
+    } catch (error) {
+      console.error("Error setting main game:", error);
+      alert("No se pudo guardar la selección.");
+    }
+  },
+
+  // --- NUEVO: Traído de la versión anterior ---
+  async clearMainGame() {
+    const settingsRef = doc(db, "app_config", "settings");
+    try {
+      await updateDoc(settingsRef, {
+        mainGameId: deleteField(),
+      });
+      this.showFeedback("Se ha quitado el juego principal.");
+    } catch (error) {
+      console.error("Error clearing main game:", error);
+      alert("No se pudo quitar la selección.");
+    }
+  },
+
+  // --- NUEVO: Traído de la versión anterior ---
+  showFeedback(message) {
+    // Elimina cualquier feedback anterior para no apilarlos
+    const existingFeedback = document.querySelector(".feedback-popup");
+    if (existingFeedback) {
+      existingFeedback.remove();
+    }
+
+    const feedback = document.createElement("div");
+    feedback.textContent = message;
+    feedback.className =
+      "feedback-popup fixed bottom-4 right-4 bg-green-600 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-300 opacity-0";
+    document.body.appendChild(feedback);
+
+    // Forzar reflow para que la transición funcione
+    setTimeout(() => {
+      feedback.classList.remove("opacity-0");
+    }, 10);
+
+    setTimeout(() => {
+      feedback.classList.add("opacity-0");
+      feedback.addEventListener("transitionend", () => feedback.remove());
+    }, 3000);
+  },
+
   displayWinners(games) {
+    // Se mantiene la lógica de la versión nueva para mostrar múltiples ganadores
     if (games.length === 0) {
       this.winnersList.innerHTML =
         '<p class="text-center text-gray-500">No hay ganadores registrados.</p>';
@@ -264,7 +365,6 @@ const uiAdmin = {
       const date = game.createdAt.toDate().toLocaleString("es-MX");
       const gameUrl = `${baseUrl}juego.html?id=${game.id}`;
 
-      // --- LÓGICA DE VISUALIZACIÓN DE GANADORES ACTUALIZADA ---
       let winnerText = '<div class="space-y-1">';
       game.winners.forEach((winner) => {
         const placeText =
