@@ -64,7 +64,7 @@
               type="number"
               id="board-count"
               value="10"
-              min="1"
+              min="2"
               max="50"
               class="mt-2 w-full p-2 border rounded-lg"
             />
@@ -157,6 +157,28 @@
               class="bg-[var(--dark-blue)] text-white px-6 py-2 rounded-lg font-bold hover:bg-[var(--light-blue)] transition-colors"
             >
               Añadir
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-8 p-6 bg-gray-50 rounded-xl border">
+          <h3 class="text-lg font-semibold text-center text-[var(--text-dark)]">
+            Ajustar número de ganadores
+          </h3>
+          <div class="flex items-center justify-center gap-4 mt-4">
+            <input
+              type="number"
+              id="update-winner-count"
+              value="1"
+              min="1"
+              max="10"
+              class="w-24 p-2 border rounded-lg text-center"
+            />
+            <button
+              id="update-winners-btn"
+              class="bg-sky-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-sky-700 transition-colors"
+            >
+              Actualizar
             </button>
           </div>
         </div>

@@ -132,6 +132,8 @@ const customGameUI = {
   deleteDraftBtn: document.getElementById("delete-draft-btn"),
   addBoardCountInput: document.getElementById("add-board-count"),
   addBoardsBtn: document.getElementById("add-boards-btn"),
+  updateWinnerCountInput: document.getElementById("update-winner-count"),
+  updateWinnersBtn: document.getElementById("update-winners-btn"),
   viewAvailableBtn: document.getElementById("view-available-btn"),
   draftActionsContainer: document.getElementById("draft-actions-container"),
   copyDraftLinkBtn: document.getElementById("copy-draft-link-btn"),
@@ -159,6 +161,9 @@ const customGameUI = {
     );
     this.deleteDraftBtn.addEventListener("click", () => this.deleteDraft());
     this.addBoardsBtn.addEventListener("click", () => this.addMoreBoards());
+    this.updateWinnersBtn.addEventListener("click", () =>
+      this.updateWinnerCount()
+    );
 
     this.copyDraftLinkBtn.addEventListener("click", () => {
       const urlToCopy = this.viewAvailableBtn.href;
@@ -190,6 +195,7 @@ const customGameUI = {
       this.displayBoardsForNaming();
       const winnerCount = this.draftData.config.winnerCount || 1;
       this.winnerDisplay.textContent = `Número de ganadores: ${winnerCount}`;
+      this.updateWinnerCountInput.value = winnerCount;
       this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
       this.draftActionsContainer.style.display = "flex";
     } else {
@@ -247,6 +253,7 @@ const customGameUI = {
       this.winnerDisplay.textContent = `Número de ganadores: ${
         winnerCount || 1
       }`;
+      this.updateWinnerCountInput.value = winnerCount || 1;
     } catch (error) {
       alert(error.message);
       console.error(error);
@@ -341,6 +348,31 @@ const customGameUI = {
         this.saveFeedback.textContent = "";
       }, 2500);
     }
+  },
+
+  async updateWinnerCount() {
+    const newWinnerCount = parseInt(this.updateWinnerCountInput.value, 10);
+    const boardCount = this.draftData.boards.length;
+
+    if (isNaN(newWinnerCount) || newWinnerCount < 1) {
+      alert("Por favor, introduce un número válido de ganadores.");
+      return;
+    }
+
+    if (newWinnerCount >= boardCount) {
+      alert(
+        `El número de ganadores (${newWinnerCount}) no puede ser igual o mayor que el número de cartillas (${boardCount}).`
+      );
+      return;
+    }
+
+    this.draftData.config.winnerCount = newWinnerCount;
+
+    // Save the draft, which also provides user feedback.
+    await this.saveDraft();
+
+    // Update the display text
+    this.winnerDisplay.textContent = `Número de ganadores: ${newWinnerCount}`;
   },
 
   async createGameFromDraft() {
