@@ -36,6 +36,7 @@ const uiGame = {
   currentCardContainer: document.getElementById("current-card-container"),
   currentCardName: document.getElementById("card-title"),
   deckCountSpan: document.getElementById("deck-count"),
+  winnerInfo: document.getElementById("winner-info"),
   callCardBtn: document.getElementById("call-card-btn"),
   winnerModal: document.getElementById("winner-modal"),
   winnersPodium: document.getElementById("winners-podium"),
@@ -78,6 +79,8 @@ const uiGame = {
     this.deckCountSpan.textContent = gameData.deck.length;
 
     const maxWinners = gameData.config.winnerCount || 1;
+    this.winnerInfo.textContent = `Ganadores: ${gameData.winners.length} de ${maxWinners}`;
+
     const isGameOver =
       gameData.winners.length >= maxWinners || gameData.deck.length === 0;
 

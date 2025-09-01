@@ -122,6 +122,7 @@ const customGameUI = {
   colsInput: document.getElementById("cols"),
   boardCountInput: document.getElementById("board-count"),
   winnerCountInput: document.getElementById("winner-count"),
+  winnerDisplay: document.getElementById("winner-display"),
   generateBoardsBtn: document.getElementById("generate-boards-btn"),
   assignNamesSection: document.getElementById("assign-names-section"),
   boardsContainer: document.getElementById("generated-boards-container"),
@@ -187,6 +188,8 @@ const customGameUI = {
         this.nextBoardId = 1;
       }
       this.displayBoardsForNaming();
+      const winnerCount = this.draftData.config.winnerCount || 1;
+      this.winnerDisplay.textContent = `Número de ganadores: ${winnerCount}`;
       this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
       this.draftActionsContainer.style.display = "flex";
     } else {
@@ -231,6 +234,8 @@ const customGameUI = {
       this.initialSetup.classList.add("hidden");
       this.assignNamesSection.classList.remove("hidden");
       this.displayBoardsForNaming();
+      const winnerCount = this.draftData.config.winnerCount || 1;
+      this.winnerDisplay.textContent = `Número de ganadores: ${winnerCount}`;
     } catch (error) {
       alert(error.message);
       console.error(error);
