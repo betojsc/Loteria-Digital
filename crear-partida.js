@@ -90,7 +90,17 @@ const gameLogic = {
     const boards = [];
     const usedBoardSignatures = new Set();
     const boardSize = rows * cols;
+    let attempts = 0;
+    const maxAttempts = playerCount * 20; // Allow 20 attempts per board
+
     while (boards.length < playerCount) {
+      attempts++;
+      if (attempts > maxAttempts) {
+        throw new Error(
+          "No se pudieron generar cartillas únicas. Intenta con una cantidad menor."
+        );
+      }
+
       const deckCopy = this.shuffleDeck();
       const newBoardCards = deckCopy.slice(0, boardSize);
       const signature = newBoardCards
@@ -204,22 +214,27 @@ const customGameUI = {
     }
 
     this.nextBoardId = 1;
-    const generatedBoards = gameLogic.generatePlayerBoards(
-      boardCount,
-      rows,
-      cols
-    );
-    this.draftData = {
-      boards: generatedBoards.map((board) => ({
-        ...board,
-        id: this.nextBoardId++,
-      })),
-      config: { rows, cols, winnerCount },
-    };
+    try {
+      const generatedBoards = gameLogic.generatePlayerBoards(
+        boardCount,
+        rows,
+        cols
+      );
+      this.draftData = {
+        boards: generatedBoards.map((board) => ({
+          ...board,
+          id: this.nextBoardId++,
+        })),
+        config: { rows, cols, winnerCount },
+      };
 
-    this.initialSetup.classList.add("hidden");
-    this.assignNamesSection.classList.remove("hidden");
-    this.displayBoardsForNaming();
+      this.initialSetup.classList.add("hidden");
+      this.assignNamesSection.classList.remove("hidden");
+      this.displayBoardsForNaming();
+    } catch (error) {
+      alert(error.message);
+      console.error(error);
+    }
   },
 
   addMoreBoards() {
@@ -230,17 +245,22 @@ const customGameUI = {
     }
 
     const { rows, cols } = this.draftData.config;
-    const newBoardsData = gameLogic.generatePlayerBoards(count, rows, cols);
+    try {
+      const newBoardsData = gameLogic.generatePlayerBoards(count, rows, cols);
 
-    const newBoardsWithId = newBoardsData.map((board) => ({
-      ...board,
-      id: this.nextBoardId++,
-    }));
+      const newBoardsWithId = newBoardsData.map((board) => ({
+        ...board,
+        id: this.nextBoardId++,
+      }));
 
-    this.draftData.boards.push(...newBoardsWithId);
-    this.displayBoardsForNaming();
+      this.draftData.boards.push(...newBoardsWithId);
+      this.displayBoardsForNaming();
 
-    this.saveFeedback.textContent = `¡Se añadieron ${count} cartillas!`;
+      this.saveFeedback.textContent = `¡Se añadieron ${count} cartillas!`;
+    } catch (error) {
+      alert(error.message);
+      console.error(error);
+    }
     setTimeout(() => {
       this.saveFeedback.textContent = "";
     }, 2500);
