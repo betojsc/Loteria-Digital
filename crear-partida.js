@@ -122,6 +122,9 @@ const customGameUI = {
   addBoardCountInput: document.getElementById("add-board-count"),
   addBoardsBtn: document.getElementById("add-boards-btn"),
   viewAvailableBtn: document.getElementById("view-available-btn"),
+  draftActionsContainer: document.getElementById("draft-actions-container"),
+  copyDraftLinkBtn: document.getElementById("copy-draft-link-btn"),
+  copyDraftFeedback: document.getElementById("copy-draft-feedback"),
   gameLinkContainer: document.getElementById("game-link-container"),
 
   draftData: null,
@@ -145,6 +148,18 @@ const customGameUI = {
     );
     this.deleteDraftBtn.addEventListener("click", () => this.deleteDraft());
     this.addBoardsBtn.addEventListener("click", () => this.addMoreBoards());
+
+    this.copyDraftLinkBtn.addEventListener("click", () => {
+      const urlToCopy = this.viewAvailableBtn.href;
+      if (urlToCopy && urlToCopy !== "#") {
+        navigator.clipboard.writeText(urlToCopy).then(() => {
+          this.copyDraftFeedback.textContent = "¡Copiado!";
+          setTimeout(() => {
+            this.copyDraftFeedback.textContent = "";
+          }, 2500);
+        });
+      }
+    });
   },
 
   async loadDraft(draftId) {
@@ -163,6 +178,7 @@ const customGameUI = {
       }
       this.displayBoardsForNaming();
       this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
+      this.draftActionsContainer.style.display = "flex";
     } else {
       alert("Borrador no encontrado.");
       window.location.href = "admin.html";
@@ -278,6 +294,7 @@ const customGameUI = {
       this.saveFeedback.textContent = "¡Borrador guardado!";
       window.history.replaceState({}, "", `?draftId=${this.draftId}`);
       this.viewAvailableBtn.href = `disponibles.html?draftId=${this.draftId}`;
+      this.draftActionsContainer.style.display = "flex";
     } catch (error) {
       console.error("Error saving draft:", error);
       this.saveFeedback.textContent = "Error al guardar.";
