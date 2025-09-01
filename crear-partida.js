@@ -216,6 +216,15 @@ const customGameUI = {
       return;
     }
 
+    if (boardCount <= winnerCount) {
+      alert(
+        `Para ${winnerCount} ganador(es), necesitas generar al menos ${
+          winnerCount + 1
+        } cartillas.`
+      );
+      return;
+    }
+
     this.nextBoardId = 1;
     try {
       const generatedBoards = gameLogic.generatePlayerBoards(
