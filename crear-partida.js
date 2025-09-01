@@ -234,8 +234,10 @@ const customGameUI = {
       this.initialSetup.classList.add("hidden");
       this.assignNamesSection.classList.remove("hidden");
       this.displayBoardsForNaming();
-      const winnerCount = this.draftData.config.winnerCount || 1;
-      this.winnerDisplay.textContent = `Número de ganadores: ${winnerCount}`;
+      // Use the winnerCount from the top of the function scope
+      this.winnerDisplay.textContent = `Número de ganadores: ${
+        winnerCount || 1
+      }`;
     } catch (error) {
       alert(error.message);
       console.error(error);
