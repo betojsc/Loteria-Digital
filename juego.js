@@ -183,7 +183,7 @@ const uiGame = {
       const placeColor = medalColors[winner.place] || "#6b7280";
       const podiumEntry = document.createElement("div");
       podiumEntry.className =
-        "flex flex-col items-center flex-shrink-0 w-[240px] md:w-auto";
+        "flex flex-col items-center w-full max-w-[260px] flex-shrink-0";
       let cardsHtml = "";
       winner.board.cards.forEach((card) => {
         cardsHtml += `<div class="relative marked"><img src="assets/images/${card.img}" class="card-image"></div>`;
